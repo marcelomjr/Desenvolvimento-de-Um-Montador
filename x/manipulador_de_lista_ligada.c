@@ -1,35 +1,53 @@
 // manipulador_de_lista_ligada.c
-void inicializa_lista(Lista_ligada *lista)
+
+#include "manipulador_de_lista_ligada.h"
+
+/* Cria uma lista ligada vazia.
+ * Recebe como parametro o endereco de um ponteiro do tipo Lista_ligada.
+ */
+void cria_lista(Lista_ligada **lista)
 {
-	*lista->prox = NULL;
+	*lista = NULL;
 }
 
-void adiciona_celula(Lista_ligada **lista, char **nova_info)
+void adiciona_celula(Lista_ligada **lista, char* info)
 {
-	Lista_ligada **ponteiro;
-	Lista_ligada *nova_celula;
+	Lista_ligada* apontador;
+	Lista_ligada* nova_celula = (Lista_ligada*) malloc(sizeof(Lista_ligada));
 
-	for (ponteiro = lista; ponteiro->prox != NULL; ponteiro = ponteiro->prox);
+	if (*lista != NULL)
+	{
+		for (apontador = *lista; apontador->prox != NULL; apontador = apontador->prox);
 
-	ponteiro->prox = nova_celula;
-
-	nova_celula = (Linha_prog**) malloc(sizeof(Lista_ligada*));
+		apontador->prox = nova_celula;
+	}
+	else
+	{
+		*lista = nova_celula;
+	}
 
 	nova_celula->prox = NULL;
 
-	nova_celula->linha = linha;
+	nova_celula->string = info;
 }
 
-void desaloca_lista()
+void remove_lista(Lista_ligada** lista)
 {
+	Lista_ligada* temp;
 
+	while (*lista != NULL)
+	{
+		temp = (*lista)->prox;
+		free(*lista);
+		*lista = temp;
+	}
 }
 
 void imprime_lista(Lista_ligada *lista)
 {
-	while (lista->prox != NULL)
+	while (lista != NULL)
 	{
-		printf("[%s]\n", lista->linha);
+		printf("[%s]\n", lista->string);
 		lista = lista->prox;
 	}
 }

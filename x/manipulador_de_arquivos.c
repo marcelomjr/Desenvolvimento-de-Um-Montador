@@ -1,11 +1,46 @@
 #include "manipulador_de_arquivos.h"
 
+int verifica_parametros(int argc,char *argv[], char **arquivo_de_entrada, char **arquivo_de_saida)
+{
+	switch (argc)
+	{
+		case (1):
+		{
+			printf("Erro! Arquivo de entrada nao fornecido!\n");
+			return 1;
+		}
+
+		case (2):
+		{
+			*arquivo_de_entrada = argv[1];
+			printf("Arquivo de Entrada: %s\n", *arquivo_de_entrada);
+			return 0;
+		}
+
+		case (3):
+		{
+			*arquivo_de_entrada = argv[1];	
+			printf("Arquivo de Entrada: %s\n", *arquivo_de_entrada);
+
+			*arquivo_de_saida = argv[2];
+			printf("Arquivo de Saida: %s\n", *arquivo_de_saida);
+			return 0;
+		}
+		default:
+		{
+			printf("Erro! Excesso de parametros.\n");
+			return 1;
+		}
+	}
+}
+
 // Essa funcao le o arquivo de entrada.
-int le_arquivo_de_entrada(char* arquivo_de_entrada)
+Lista_ligada* le_arquivo_de_entrada(char* arquivo_de_entrada)
 {
 	char temp = 0;
 	int conta_char = 0;
-	char **programa;
+	char *buffer;
+	Lista_ligada *programa;
 
 	// Abertura do arquivo de entrada.
 	FILE* ponteiro_arq_de_entrada = fopen(arquivo_de_entrada, "r");
@@ -14,8 +49,11 @@ int le_arquivo_de_entrada(char* arquivo_de_entrada)
 	if (ponteiro_arq_de_entrada == NULL)
 	{
 		printf("Arquivo \"%s\" nao foi encontrado!\n", arquivo_de_entrada);
-		return 1;
+		return NULL;
 	}
+
+	// Cria lista encadeada para registrar o programa em linguagem de montagem.
+	cria_lista(&programa);
 
 	// Percorre o arquivo ateh o final, lendo um caractere de cada vez.
 	while (fscanf(ponteiro_arq_de_entrada, "%c", &temp) != EOF)
@@ -40,53 +78,18 @@ int le_arquivo_de_entrada(char* arquivo_de_entrada)
 				// Determina o fim da string.
 				buffer[conta_char - 1] = '\0';
 				
-				printf("[%s]", buffer);
-				// pegar uma linha, colocar numa string e mandar para a função de analise.
+				adiciona_celula(&programa, buffer);
 
-				// Libera a memoria alocada.
-				free(buffer);
+				// pegar uma linha, colocar numa string e mandar para a função de analise.
 			}
 
 			// Zera contador de caracteres.
 			conta_char = 0;
 		}
+
 	}
+
 	// Fecha o arquivo de entrada.
 	fclose(ponteiro_arq_de_entrada);
+	return programa;
 }
-
-void inicializa_lista(Linha_prog **programa)
-{
-	*programa = NULL;
-}
-
-void adiciona_linha(Linha_prog **programa, char **linha)
-{
-	Linha_prog **ponteiro;
-	Linha_prog *nova_linha;
-
-	for (ponteiro = programa; ponteiro->prox != NULL; ponteiro = ponteiro->prox);
-
-	ponteiro->prox = nova_linha;
-
-	nova_linha = (Linha_prog**) malloc(sizeof(Linha_prog*));
-
-	nova_linha->prox = NULL;
-
-	nova_linha->linha = linha;
-}
-
-void desaloca_lista()
-{
-
-}
-
-void imprime_lista(*lista)
-{
-	while (lista->prox != NULL)
-	{
-		printf("[%s]\n", lista->linha);
-		lista = lista->prox;
-	}
-}
-
