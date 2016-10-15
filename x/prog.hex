@@ -1,0 +1,5 @@
+vetor1:
+vetor2:   .word 10
+vetor3:   .word 10 # Comentario apos diretiva
+
+.word 10
