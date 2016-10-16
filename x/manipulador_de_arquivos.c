@@ -92,7 +92,7 @@ Lista_ligada* le_arquivo_de_entrada(char* arquivo_de_entrada)
 				// Determina o fim da string.
 				buffer[tamanho - 1] = '\0';
 				
-				adiciona_celula(&programa, buffer, conta_linha);
+				adiciona_celula(&programa, buffer, NULL, conta_linha);
 			}
 			// caso seja um espaco
 			if (temp == ' ' || temp == '\t')

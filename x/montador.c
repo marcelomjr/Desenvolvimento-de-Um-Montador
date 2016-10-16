@@ -10,116 +10,155 @@ boolean identifica_diretiva(char *elemento)
 
 }
 
-int identifica_elementos(Lista_ligada** programaLM)
+int registra_rotulo(Lista_ligada** lista_de_rotulos, Lista_ligada* rotulo, int palavra_atual, char orientacao)
 {
-	Lista_ligada *apontador;
-	int num_linha = 0;
-	int cursor = -1; // Valor para identificar a linha 0.
-
-	// Encontra o numero de linhas nao vazias;
-	for (apontador = *programaLM; apontador != NULL; apontador = apontador->prox)
+	char chr;
+	boolean rotulo_valido = TRUE;
+	char *orint; // Orientacao
+	// printf("Wnrou rotulo: %s\n", rotulo->string);//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	if (rotulo->string[0] >= '0' && rotulo->string[0] <= '9')
 	{
-		if (apontador->info > cursor)
-		{
-			cursor = apontador->info;
-			num_linha++;
-		}
+
+		printf("ERROR on line %d\n", rotulo->info);
+		printf("Rotulos nao podem ser iniciados com um numero!\n");
+		return 1;
 	}
 
-	printf("linhas_n_vazias: %d\n", num_linha);
+	for (int posicao = 0; rotulo->string[posicao] != ':' && rotulo_valido; posicao++)
+	{
+		chr = rotulo->string[posicao];
+		if (!((chr >= '0' && chr <= '9') || (chr >= 'A' && chr <= 'Z') || (chr >= 'a' && chr <= 'z') || chr == '_'))
+		{
+			printf("ERROR on line %d\n", rotulo->info);
+			printf("caractere \'%c\' eh invalido para um rotulo!\n", chr);
+			return 1;		
+		}
+	}
+	
+	orint = (char *) malloc(2 * sizeof(char));
+	orint[0] = orientacao;
+	orint[1] = '\0';
+	adiciona_celula(lista_de_rotulos, rotulo->string, orint, palavra_atual);
 
-	// Lista_ligada *linha = *programaLM;
-	// int posicao, cursor;
-	// boolean instrucao, diretiva, rotulo;
-	// boolean fim_de_linha;
+	return 0;
+}
 
-	// while (linha != NULL)
-	// {
-	// 	instrucao = FALSE;
-	// 	diretiva = FALSE;
-	// 	rotulo = FALSE;
-	// 	fim_de_linha = FALSE;
-	// 	posicao = 0;
+int identifica_elementos(Lista_ligada* programaLM)
+{
+	Lista_ligada *apontador;
+	Lista_ligada *lista_de_rotulos;
+	boolean instrucao, diretiva, rotulo;
+	boolean fim_de_linha;
+	char caractere;
+	int posicao, num_char;
+	int linha_atual = -1;
+	
+	int cursor = -1; // Valor para identificar a linha 0.
+	/* O valor do modulo dessa variavel representa a memoria do IAS, que vai de 0 a 1024.*/
+	int palavra_atual = 0;;
+	char orientacao = 'E';
 
-	// 	cursor = 0; 
-	// 	printf("=========== LINHA %d (INICIO) ===========\n", linha->info);
+	// Criacao de uma lista ligada para registrar os rotulos e seus enderecos.
+	cria_lista(&lista_de_rotulos);
 
-	// 	while (linha->string[posicao] != '\0' && !fim_de_linha)
-	// 	{
-	// 		printf("cursor: %d| linha->string[%d]: %c\n", cursor, posicao, linha->string[posicao]);
-	// 		// Comentario.
-	// 		if (linha->string[posicao] == '#')
-	// 		{
-	// 			fim_de_linha = TRUE;
-	// 			printf("comentário na linha: %d \n", linha->info);
-	// 		}
-
-	// 		// Rotulo.
-	// 		else if (linha->string[posicao] == ':')
-	// 		{
-	// 			if (rotulo)
-	// 			{
-	// 				printf("ERROR on line %d\n", linha->info);
-	// 				printf("Em cada linha pode haver apenas um rotulo!\n");
-	// 				return 1;
-	// 			}
-	// 			else if (diretiva)
-	// 			{
-	// 				printf("ERROR on line %d\n", linha->info);
-	// 				printf("Rotulos nao sao permitidos apos diretivas numa mesma linha!\n");
-	// 				return 1;
-	// 			}
-	// 			else if (instrucao)
-	// 			{
-	// 				printf("ERROR on line %d\n", linha->info);
-	// 				printf("Rotulos nao sao permitidos apos instrucoes numa mesma linha!\n");
-	// 				return 1;
-	// 			}
-
-	// 			else
-	// 			{
-	// 				rotulo = TRUE;
-	// 				printf("Rotulo na linha: %d\n", linha->info);
-	// 				printf("[");
-	// 				for (int i = cursor; i < posicao; i++)
-	// 				{
-	// 					printf("%c", linha->string[i]);
-						
-	// 				}
-	// 				printf("]\n");
-	// 				cursor = posicao + 1;
-	// 			}
-	// 		}
-
-	// 		// Diretiva.
-	// 		else if (linha->string[posicao] == '.')
-	// 		{
-	// 			if (!instrucao)
-	// 			{
-	// 				diretiva = TRUE;
-	// 			}
-				
-	// 		}
-
-	// 		else if (linha->string[posicao] == ' ')
-	// 		{
-	// 			else if (!diretiva && !instrucao)
-	// 			{
-	// 				cursor++;
-	// 			}
-
-	// 		}
-	// 		// else
-	// 		// {
-	// 		// 	cursor = posicao + 1;
-	// 		// }
-	// 		posicao++;
-	// 	}
-
-	// 	printf("=========== LINHA %d (FIM) ==============\n\n", linha->info);
-	// 	linha = linha->prox;
+ 	
+	// Encontra o numero de linhas nao vazias;
+	for (apontador = programaLM; (apontador != NULL && palavra_atual < 1024); apontador = apontador->prox)
+	{
+		// Nova linha
+		if (linha_atual < apontador->info)
+		{
+			// Reset de flags.
+			fim_de_linha = FALSE;
+			instrucao = FALSE;
+			diretiva = FALSE;
+			rotulo = FALSE;
+			// atualiza o numero da linha do programa em linguagem de montagem.
+			linha_atual = apontador->info;
+		}
 		
-	// }
+		// Determina o numero de caracteres na string
+		for (posicao = 0; apontador->string[posicao] != '\0'; posicao++);
+		num_char = posicao;
+
+		// Percorre a string buscando determinar qual eh o elemento (instrucao, diretiva, etc)
+		for (posicao = 0; posicao < num_char && !fim_de_linha; posicao++)
+		{
+			caractere = apontador->string[posicao];
+			// Identificou um comentario.
+			if (caractere == '#')
+			{
+				if (posicao == 0)
+				{
+					for (; apontador->prox != NULL && apontador->prox->info == linha_atual; apontador = apontador->prox);
+					fim_de_linha = TRUE;
+				}
+				else
+				{
+					printf("ERROR on line %d\n", apontador->info);
+					printf("Comentario invalido!\n");
+					return 1;
+				}
+			}
+			// Identificou uma diretiva
+			else if (caractere == '.')
+			{
+				if (posicao == 0)
+				{
+					diretiva = TRUE;
+				}
+				else
+				{
+					printf("ERROR on line %d\n", apontador->info);
+					printf("Comentario invalido!\n");
+					return 1;
+				}
+			}
+
+			// Identificou um rotulo.
+			else if (caractere == ':')
+			{
+				//printf("rotulo%d. Linha: %d\n", rotulo, apontador->info);>>>>>>>>>>>>>>>>>>>>>>>>
+				if (rotulo)
+				{
+					printf("ERROR on line %d\n", apontador->info);
+					printf("Nao eh possivel haver dois rotulos em uma mesma linha!\n");
+					return 1;
+				}
+				else if (diretiva)
+				{	
+					printf("ERROR on line %d\n", apontador->info);
+					printf("Nao eh possivel inserir rotulos apos diretivas!\n");
+					return 1;
+				}
+				else if (instrucao)
+				{
+					printf("ERROR on line %d\n", apontador->info);
+					printf("Nao eh possivel inserir instrucoes apos diretivas!\n");
+					return 1;
+				}
+				else
+				{
+					if (posicao == num_char - 1)
+					{
+						rotulo = TRUE;
+
+						if (registra_rotulo(&lista_de_rotulos, apontador, palavra_atual, orientacao) == 1)
+						{
+							return 1;
+						}
+					}
+					else
+					{
+						printf("ERROR on line %d\n", apontador->info);
+						printf("Rotulo invalido!\n");
+						return 1;
+					}
+				}
+			}
+		}
+	}
+	imprime_lista(lista_de_rotulos, 12);//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }
 boolean compara_strings(char *string1, char *string2)
 {
@@ -234,7 +273,7 @@ char * decimal_para_hex(int numero, int num_digitos)
 			digito[0] = resto;
 			digito[1] = '\0';
 			
-			adiciona_celula(&numero_invertido, digito, 0);
+			adiciona_celula(&numero_invertido, digito, NULL, 0);
 			conta_digito++;
 		}		
 	} while (quociente != 0);
@@ -328,15 +367,16 @@ int main(int argc,char *argv[])
 		return 0;
 	}
 
-	imprime_lista(programaLM);
+	imprime_lista(programaLM, 1);
 
-	// inicializa_mapa(mapa_de_memoria);
+	inicializa_mapa(mapa_de_memoria);
 	preenche_enderecos(mapa_de_memoria);
 	// imprime_mapa(mapa_de_memoria);
 	
-	if (identifica_elementos(&programaLM) == 1)
+	if (identifica_elementos(programaLM) == 1)
 	{
 		return 0;
 	}
+
 	return 0;
 }
