@@ -10,7 +10,7 @@ void cria_lista(Lista_ligada **lista)
 	*lista = NULL;
 }
 
-void adiciona_celula(Lista_ligada **lista, char* info)
+void adiciona_celula(Lista_ligada **lista, char* str, int informacao)
 {
 	Lista_ligada* apontador;
 	Lista_ligada* nova_celula = (Lista_ligada*) malloc(sizeof(Lista_ligada));
@@ -28,7 +28,9 @@ void adiciona_celula(Lista_ligada **lista, char* info)
 
 	nova_celula->prox = NULL;
 
-	nova_celula->string = info;
+	nova_celula->string = str;
+	nova_celula->info = informacao;
+
 }
 
 void remove_lista(Lista_ligada** lista)
@@ -38,6 +40,12 @@ void remove_lista(Lista_ligada** lista)
 	while (*lista != NULL)
 	{
 		temp = (*lista)->prox;
+
+		if ((*lista)->string != NULL)
+			{
+				free((*lista)->string);
+			}
+
 		free(*lista);
 		*lista = temp;
 	}
@@ -45,9 +53,19 @@ void remove_lista(Lista_ligada** lista)
 
 void imprime_lista(Lista_ligada *lista)
 {
+	int linha_atual = 0;
+	printf("%.2d:", linha_atual);
+
 	while (lista != NULL)
 	{
-		printf("[%s]\n", lista->string);
+		if (lista->info > linha_atual)
+		{
+			printf("\n");
+			linha_atual = lista->info;
+			printf("%.2d:", linha_atual);
+		}
+		printf("[%s] ", lista->string);
 		lista = lista->prox;
 	}
+	printf("\n");
 }

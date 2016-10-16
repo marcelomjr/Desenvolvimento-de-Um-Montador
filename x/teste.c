@@ -1,22 +1,13 @@
 //teste.c
-#include "manipulador_de_lista_ligada.h"
+#include <stdio.h>
 
 int main()
 {
-	
-	Lista_ligada *prog;
-	char h[] = "hoje";
-	char e[] = "esta um dia ";
-	char l[] = "lindo";
-	cria_lista(&prog);
-	
-	adiciona_celula(&prog, h);
-	adiciona_celula(&prog, e);
-	adiciona_celula(&prog, l);
 
-	imprime_lista(prog);
-	remove_lista(&prog);
-	imprime_lista(prog);
+	unsigned int i = 0x2b;
+
+	printf("%c\n", i);
+	
 	printf("Fim do programa!\n");
 	return 0;
 }

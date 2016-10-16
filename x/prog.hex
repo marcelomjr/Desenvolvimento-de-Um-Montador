@@ -1,12 +1,15 @@
 vetor1:
 vetor2:   .word 10
 vetor3:   .word 10 # Comentario apos diretiva
+ 
 
+	
+	c
 .word 10
 .word 10  # Comentario apos diretiva
 # Comentario sozinho  
+                    v
+ve tor4:  ADD "0x0000000100"
+vetor5: ADD "0x0 000000100" # Comentario apos instrucao
 
-vetor4: ADD "0x0000000100"
-vetor5: ADD "0x0000000100" # Comentario apos instrucao
-
-ADD "0x0000000100"
+ADD"0x0000000100d"v 

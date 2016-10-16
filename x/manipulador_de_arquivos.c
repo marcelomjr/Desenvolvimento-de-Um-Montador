@@ -38,9 +38,11 @@ int verifica_parametros(int argc,char *argv[], char **arquivo_de_entrada, char *
 Lista_ligada* le_arquivo_de_entrada(char* arquivo_de_entrada)
 {
 	char temp = 0;
-	int conta_char = 0;
+	int cursor_inicio = 0, cursor_fim = 0;
+	int conta_linha = 0, tamanho;
 	char *buffer;
 	Lista_ligada *programa;
+	boolean linha_vazia = TRUE;
 
 	// Abertura do arquivo de entrada.
 	FILE* ponteiro_arq_de_entrada = fopen(arquivo_de_entrada, "r");
@@ -59,37 +61,61 @@ Lista_ligada* le_arquivo_de_entrada(char* arquivo_de_entrada)
 	while (fscanf(ponteiro_arq_de_entrada, "%c", &temp) != EOF)
 	{
 		// Contador para o tamanho da linha.
-		conta_char++;
-
-		// Final de linha.
-		if (temp == '\n')
+		cursor_fim++;
+		// Verifica se a linha nao esta vazia, ou seja so possui espacos.
+		if (linha_vazia && temp != ' ' && temp != '\t' && temp != '\n')
 		{
-			if (conta_char != 1)
-			{
-				// Faz com que o ponteiro do arquivo retorne ao inicio da linha.
-				fseek(ponteiro_arq_de_entrada, (-conta_char * sizeof(char)), SEEK_CUR);
-
-				// Aloca o espaço necessário para o registro da linha.
-				buffer = malloc(conta_char * sizeof(char));
-
-				// Leitura de toda a linha de uma vez
-				fread(buffer, (conta_char * sizeof(char)), 1, ponteiro_arq_de_entrada);
-
-				// Determina o fim da string.
-				buffer[conta_char - 1] = '\0';
-				
-				adiciona_celula(&programa, buffer);
-
-				// pegar uma linha, colocar numa string e mandar para a função de analise.
-			}
-
-			// Zera contador de caracteres.
-			conta_char = 0;
+			linha_vazia = FALSE;
 		}
 
+		// Verifica se nao eh apenas um espaco em branco ou uma linha vazia.
+		else if (((temp == ' ' || temp == '\t') && cursor_fim - cursor_inicio == 1) || (temp == '\n' && linha_vazia))
+		{
+			cursor_inicio++;
+		}
+
+		// Final de linha ou quando encontra um espaco ou tab.
+		else if (temp == '\n' || temp == ' ' || temp == '\t')
+		{
+			tamanho = cursor_fim - cursor_inicio;
+			if (tamanho > 1)
+			{
+				// Faz com que o ponteiro do arquivo retorne ao inicio do objeto analisado.
+				fseek(ponteiro_arq_de_entrada, (-tamanho * sizeof(char)), SEEK_CUR);
+
+				// Aloca o espaço necessário para o registro da linha.
+				buffer = malloc(tamanho * sizeof(char));
+
+				// Leitura de toda a linha de uma vez
+				fread(buffer, (tamanho * sizeof(char)), 1, ponteiro_arq_de_entrada);
+
+				// Determina o fim da string.
+				buffer[tamanho - 1] = '\0';
+				
+				adiciona_celula(&programa, buffer, conta_linha);
+			}
+			// caso seja um espaco
+			if (temp == ' ' || temp == '\t')
+			{
+				cursor_inicio = cursor_fim;
+			}
+		}
+		if (temp == '\n')
+		{
+			// Incrementa o contador de linhas.
+			conta_linha++;
+
+			// Zera os cursores.
+			cursor_inicio = 0;
+			cursor_fim = 0;
+
+			// Reinicia a flag.
+			linha_vazia = TRUE;
+		}
 	}
 
 	// Fecha o arquivo de entrada.
 	fclose(ponteiro_arq_de_entrada);
+
 	return programa;
 }
