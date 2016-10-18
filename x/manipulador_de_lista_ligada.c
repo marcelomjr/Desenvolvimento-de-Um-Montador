@@ -65,7 +65,7 @@ void remove_lista(Lista_ligada** lista)
  */
 void imprime_lista(Lista_ligada *lista, int opcao_de_string)
 {
-	int linha_atual = 0;
+	int linha_atual = 1;
 	printf("%.2d:", linha_atual);
 
 	while (lista != NULL)

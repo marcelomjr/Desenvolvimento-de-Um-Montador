@@ -1,22 +1,7 @@
 vetor1:
-vetor2:   word 10
-vetor3   word 10 Comentario: apos diretiva
- fufhdufhud # ksrd
+vetor2:   .word casa
+vetor3:   .word 10 # Comentario apos diretiva
 
-	
-	c
-.word 10 
+.word 10
 .word 10  # Comentario apos diretiva
 # Comentario sozinho  
-#d fd
-                    v
-ve tor:  ADD "0x0000000100"
-vetor5: ADD "0x0 000000100  Comentario .wfill apos instrucao
-.word 10  # Comentario apos diretiva
-# Comentario sozinho  
-ADD"0x0000000100d"v # 
-varX:
-var1:
-_varX2:
-laco_1:
-__DEBUG__:

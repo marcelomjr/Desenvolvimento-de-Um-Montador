@@ -1,5 +1,33 @@
 #include "manipulador_de_caracteres.h"
 
+
+int registra_rotulo(Lista_ligada** lista_de_rotulos, Lista_ligada* rotulo, int palavra_atual, char orientacao)
+{
+	char *lado; // Lado esquerdo ou direito da palavra de memoria.
+	char *_rotulo;
+	int tamanho;
+
+	if (!verifica_rotulo(rotulo, TRUE))
+	{
+		return 1;
+	}
+
+	_rotulo = copia_string(rotulo->string, 0);
+	tamanho = getTamanho(_rotulo);
+
+	// Retira os ':' do rotulo para este ser armazenado.
+	_rotulo[tamanho - 1] = '\0';
+
+	// Orientacao do rotulo.
+	lado = (char *) malloc(2 * sizeof(char));
+	lado[0] = orientacao;
+	lado[1] = '\0';
+
+	adiciona_celula(lista_de_rotulos, _rotulo, lado, palavra_atual);
+
+	return 0;
+}
+
 boolean compara_strings(char *string1, char *string2)
 {
 	int posicao = 0;
@@ -57,29 +85,44 @@ char * copia_string(char *string1, int inicio)
 
 	return string2;
 }
-
-int base_string_para_decimal_int(char *string, int base)
+// converte qualquer base entre 2 e 16 em (string) para base 10 em (int).
+long int base_string_para_decimal_int(char *string, int base)
 {
 	int tamanho = 0;
-	int numero = 0;
-	int potencia = 1;
+	long int numero = 0;
+	long int potencia = 1;
+	long int fator;
 
+	// printf("base_string_para_decimal_int(string)[%s]\n",string );
 	while (string[tamanho++] != '\0');
 
-	for (int posicao = tamanho - 1; posicao >= 0; posicao--)
+	for (int posicao = tamanho - 2; posicao >= 0; posicao--)
 	{
-		numero = numero + (int) ((string[posicao] - 30) * potencia);
+		if (string[posicao] >= 'a' && string[posicao] <= 'f')
+		{
+			fator = (long int) string[posicao] - 'a' + 10;
+		}
+		else if (string[posicao] >= 'A' && string[posicao] <= 'F')
+		{
+			fator = (long int) string[posicao] - 'A' + 10;
+		}
+		else
+		{
+			fator = (long int) string[posicao] - '0';
+		}
+		numero = numero + (fator * potencia);
 		potencia *= base;
 	}
 
+	return numero;
 }
 
-char * decimal_para_hex(int numero, int num_digitos)
+char * decimal_para_hex(long int numero, int num_digitos)
 {
 	char *num_convertido;
 	char resto = 0;
-	int dividendo = numero;
-	int quociente = 0; // Divisor inicial.
+	long int dividendo = numero;
+	long int quociente = 0; // Divisor inicial.
 	Lista_ligada *numero_invertido;
 	Lista_ligada* apontador; 
 	char *digito;
@@ -202,10 +245,14 @@ int preenche_palavra_n_vezes(Lista_ligada* elemento, char mapa[][13], char *pala
 	}
 }
 
-boolean verifica_hexadecimal(Lista_ligada *numero, boolean imprime_erros)
+boolean verifica_hexadecimal(Lista_ligada *numero, long int min, long int max, boolean imprime_erros)
 {
 	int posicao;
 	int tamanho;
+	char *aux;
+	long int menos_1_hex = 1099511627775; 		// 0xFFFFFFFFFF
+	long int menor_negativo_hex = 1030792151040; 	// 0xF000000000
+	long int numero_decimal;
 	char chr;
 	boolean numero_valido = TRUE;
 
@@ -236,19 +283,44 @@ boolean verifica_hexadecimal(Lista_ligada *numero, boolean imprime_erros)
 		}
 
 	}
+	aux = copia_string(numero->string, 2);
+
+	numero_decimal = base_string_para_decimal_int(aux, 16);
+
+	/* Se numero_decimal for maior do que menor_negativo_hex quer dizer que o primeiro eh negativo
+	 * representacao de complemento de dois. */
+	if (numero_decimal > menor_negativo_hex)
+	{
+		numero_decimal = (long int) -(menos_1_hex - numero_decimal + 1);
+	}
+	printf("					S	[%ld]%s]]\n", numero_decimal, decimal_para_hex(4294967295, 10));
+
+
+	if (!(numero_decimal >= min && numero_decimal <= max))
+	{
+		printf("ERROR on line %d\n", numero->info);
+		printf("O argumento deve estar no intervalo (0x%s:0x%s)!\n", decimal_para_hex(min, 10), decimal_para_hex(max, 10));
+		return 1;
+	}
 
 	return TRUE;
 }
 
-boolean verifica_decimal (Lista_ligada *numero, int min, int max, int *num_decimal, boolean imprime_erros)
+boolean verifica_decimal (Lista_ligada *numero, long int min, long int max, long int *num_decimal, boolean imprime_erros)
 {
-	int posicao;
+	int posicao = 0;
 	boolean numero_valido = TRUE;
 	char caractere;
 	int valor;
-	int potencia = 1;
+	boolean negativo = FALSE;
 
-	for (posicao = 0; numero->string[posicao] != '\0' && numero_valido; posicao++)
+	if (numero->string[0] == '-')
+	{
+		negativo = TRUE;
+		numero->string[0] = '0';	
+	}
+
+	for (; numero->string[posicao] != '\0' && numero_valido; posicao++)
 	{
 		caractere = numero->string[posicao];
 		if (!(caractere >= '0' && caractere <= '9'))
@@ -262,9 +334,13 @@ boolean verifica_decimal (Lista_ligada *numero, int min, int max, int *num_decim
 		}
 	}
 
+
 	valor = base_string_para_decimal_int(numero->string, 10);
 
-	printf("Testeeeeeeeeeeeedecimal: %d\n", valor);//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	if (negativo)
+	{
+		valor *= -1;
+	}
 
 	if (valor >= min && valor <=max)
 	{
@@ -276,7 +352,7 @@ boolean verifica_decimal (Lista_ligada *numero, int min, int max, int *num_decim
 		if (imprime_erros)
 		{
 			printf("ERROR on line %d\n", numero->info);
-			printf("Numero decimal deve ser entre os limites de %d e %d!\n", min, max);
+			printf("Numero decimal esperado deveria estar no intervalo (%ld:%ld)!\n", min, max);
 		}
 		return FALSE;
 	}
@@ -344,3 +420,4 @@ boolean verifica_simbolo(Lista_ligada *simbolo, boolean imprime_erros)
 	}
 	return TRUE;
 }
+

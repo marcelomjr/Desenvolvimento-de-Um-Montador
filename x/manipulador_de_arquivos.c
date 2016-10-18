@@ -39,7 +39,7 @@ Lista_ligada* le_arquivo_de_entrada(char* arquivo_de_entrada)
 {
 	char temp = 0;
 	int cursor_inicio = 0, cursor_fim = 0;
-	int conta_linha = 0, tamanho;
+	int conta_linha = 1, tamanho;
 	char *buffer;
 	Lista_ligada *programa;
 	boolean linha_vazia = TRUE;
