@@ -8,4 +8,5 @@
 #include "manipulador_de_caracteres.h"
 #include "manipulador_de_diretivas.h"
 #include "manipulador_de_memoria.h"
+#include "manipulador_de_instrucoes.h"
 

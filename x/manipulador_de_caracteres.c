@@ -16,7 +16,7 @@ int registra_rotulo(Lista_ligada** lista_de_rotulos, Lista_ligada* rotulo, int p
 	tamanho = getTamanho(_rotulo);
 
 	// Retira os ':' do rotulo para este ser armazenado.
-	_rotulo[tamanho - 1] = '\0';
+	_rotulo[tamanho - 2] = '\0';
 
 	// Orientacao do rotulo.
 	lado = (char *) malloc(2 * sizeof(char));
@@ -293,8 +293,6 @@ boolean verifica_hexadecimal(Lista_ligada *numero, long int min, long int max, b
 	{
 		numero_decimal = (long int) -(menos_1_hex - numero_decimal + 1);
 	}
-	printf("					S	[%ld]%s]]\n", numero_decimal, decimal_para_hex(4294967295, 10));
-
 
 	if (!(numero_decimal >= min && numero_decimal <= max))
 	{

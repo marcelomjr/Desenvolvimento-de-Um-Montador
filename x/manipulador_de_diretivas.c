@@ -309,9 +309,6 @@ int trata_word(Lista_ligada *argumento1, Lista_ligada **lista_de_rotulos_desc, L
 		// Ignora o "0x" do numero hexadecimal.
 		arg1 = copia_string(argumento1->string, 2);
 
-		// numero decimal em int para verificar os limites.
-		num_decimal = base_string_para_decimal_int(arg1, 16);
-
 		if (preenche_palavra_n_vezes(argumento1, mapa, arg1, *palavra_atual, *orientacao, 1) == 1)
 		{
 			return 1;

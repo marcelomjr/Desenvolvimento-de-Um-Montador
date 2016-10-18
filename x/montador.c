@@ -57,12 +57,6 @@ int primeira_montagem(Lista_ligada* programaLM, char mapa[][13])
 		// Nova linha
 		if (linha_atual < apontador->info)
 		{
-			// Avanco da leitura da memoria.
-			if (instrucao)
-			{
-				avanca_meias_palavra(&palavra_atual, &orientacao, 1);
-			}
-
 			// Reset de flags.
 			fim_de_linha = FALSE;
 			instrucao = FALSE;
@@ -180,15 +174,31 @@ int primeira_montagem(Lista_ligada* programaLM, char mapa[][13])
 		}
 		if (!elemento_identificado)
 		{
-			instrucao = TRUE;
-			//verifica_instrucao();
+			if (tratador_de_instrucoes(&apontador, &lista_de_rotulos_desc, mapa, &palavra_atual, &orientacao) == 1)
+			{
+				return 1;
+			}
+			else
+			{
+				if (instrucao)
+				{
+					printf("ERROR on line %d\n", apontador->info);
+					printf("Nao eh possivel haver duas instrucoes em uma mesma linha!\n");
+					return 1;
+				}
+				if (diretiva)
+				{
+					printf("ERROR on line %d\n", apontador->info);
+					printf("Nao eh possivel inserir diretivas e instrucoes na mesma linha!\n");
+					return 1;
+				}
+				instrucao = TRUE;	
+			}
 		}
 		// Fim da analise de um elemento.
 	}
 	imprime_lista(lista_de_rotulos, 12);//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }
-
-
 
 int main(int argc,char *argv[])
 {

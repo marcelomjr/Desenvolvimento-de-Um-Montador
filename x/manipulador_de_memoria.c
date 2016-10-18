@@ -22,7 +22,7 @@ void imprime_mapa(char mapa[][13])
 {
 	int palavra, posicao;
 
-	for (palavra = 0; palavra < 1024; palavra++)
+	for (palavra = 0; palavra < 10/*24*/; palavra++)
 	{
 		for (posicao = 0; posicao < 13; posicao++)
 		{
