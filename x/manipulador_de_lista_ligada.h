@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "tipos.h"
+#include "manipulador_de_caracteres.h"
 
 struct lista
 {

@@ -1,6 +1,6 @@
 #include "manipulador_de_diretivas.h"
 
-int tratador_de_diretivas(Lista_ligada **diretiva, Lista_ligada **lista_de_simbolos, Lista_ligada **lista_de_rotulos_desc, Lista_ligada **lista_de_simbolos_desc, int *palavra_atual, int *align, char *orientacao, char mapa[][13])
+int tratador_de_diretivas(Lista_ligada **diretiva, Lista_ligada **lista_de_simbolos, Lista_ligada **lista_de_rotulos_desc, Lista_ligada **lista_de_simbolos_desc, int *palavra_atual, int *align, char *orientacao, Lista_ligada **mapa)
 {
 	// DIRETIVA SET.
 	// if (compara_strings((*diretiva)->string, ".set"))
@@ -81,6 +81,7 @@ int tratador_de_diretivas(Lista_ligada **diretiva, Lista_ligada **lista_de_simbo
 	// DIRETIVA WORD
 	/*/else */if (compara_strings((*diretiva)->string, ".word"))
 	{
+
 		if ((*diretiva)->prox == NULL || (*diretiva)->info != (*diretiva)->prox->info)
 		{	
 			printf("ERROR on line %d\n", (*diretiva)->info);
@@ -94,7 +95,7 @@ int tratador_de_diretivas(Lista_ligada **diretiva, Lista_ligada **lista_de_simbo
 		}
 
 		*diretiva = (*diretiva)->prox;
-		avanca_meias_palavra(palavra_atual, orientacao, 2);
+		return 0;
 	}
 	else
 	{
@@ -284,55 +285,61 @@ int tratador_de_diretivas(Lista_ligada **diretiva, Lista_ligada **lista_de_simbo
 
 // }
 
-int trata_word(Lista_ligada *argumento1, Lista_ligada **lista_de_rotulos_desc, Lista_ligada **lista_de_simbolos_desc, char mapa[][13], int *palavra_atual, char *orientacao)
+int trata_word(Lista_ligada *argumento1, Lista_ligada **lista_de_rotulos_desc, Lista_ligada **lista_de_simbolos_desc, Lista_ligada **mapa, int *palavra_atual, char *orientacao)
 {
 	long int num_decimal;
-	int posicao;
-	char *arg1;
-	char temp[10];
+	boolean argumento_valido = FALSE;
+	char meia_palavra1[11];
+	char meia_palavra2[11];
+	char *palavara_inteira;
+
+	if (orientacao[0] == 'D')
+	{
+		printf("ERROR on line %d\n", argumento1->info);
+		printf("A diretiva .word nao pode ser utilizada quando se esta no lado direito da palavra de memoria!\n");
+	}
 
 	// Verifica se o argumento eh um decimal.
 	if (verifica_decimal (argumento1, 0, 4294967295, &num_decimal, FALSE))
 	{
-		arg1 = decimal_para_hex(num_decimal, 10);
-			
-
-		if (preenche_palavra_n_vezes(argumento1, mapa, arg1, *palavra_atual, *orientacao, 1) == 1)
-		{
-			return 1;
-		}
+		// converte o decimal para hexadecimal e quebra a palavra ao meio.
+		palavara_inteira = decimal_para_hex(num_decimal, 10);
+		quebra_string(palavara_inteira, meia_palavra1, meia_palavra2);
+		
+		argumento_valido = TRUE;
+		
+		free(palavara_inteira);
 	}
 
 	// Verifica se o argumento eh um hexadecimal.
 	else if (verifica_hexadecimal(argumento1, 0, 4294967295, FALSE))
 	{
 		// Ignora o "0x" do numero hexadecimal.
-		arg1 = copia_string(argumento1->string, 2);
+		quebra_string(copia_string(argumento1->string, 2), meia_palavra1, meia_palavra2);
 
-		if (preenche_palavra_n_vezes(argumento1, mapa, arg1, *palavra_atual, *orientacao, 1) == 1)
-		{
-			return 1;
-		}
+		argumento_valido = TRUE;
 	}
+
 	// Verifica se o argumento 1 eh um rotulo ou simbolo.
 	else if (verifica_rotulo(argumento1, FALSE) || verifica_simbolo(argumento1, FALSE))
 	{
-		arg1 = (char *) malloc(11 * sizeof(char));
 
-		for (posicao = 0; posicao < 10; posicao++)
+		for (int posicao = 0; posicao < 5; posicao++)
 		{
-			arg1[posicao] = '?';
+			meia_palavra1[posicao] = '?';
+			meia_palavra2[posicao] = '?';
 		}
 
-		arg1[10] = '\0';
+		meia_palavra1[5] = '\0';
+		meia_palavra2[5] = '\0';
 
-		// Marca essa palavra para sabermos que ela devera ser alterada.
-		if (preenche_palavra_n_vezes(argumento1, mapa, arg1, *palavra_atual, *orientacao, 1) == 1)
-		{
-			return 1;
-		}
+		argumento_valido = TRUE;
+	}
 
-		return 0;
+	if (argumento_valido)
+	{
+		avanca_meia_palavra(mapa, meia_palavra1, orientacao, palavra_atual);
+		avanca_meia_palavra(mapa, meia_palavra2, orientacao, palavra_atual);
 	}
 	else
 	{

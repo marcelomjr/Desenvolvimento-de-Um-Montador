@@ -3,42 +3,38 @@
 #include "manipulador_de_instrucoes.h"
 #include "manipulador_de_caracteres.h"
 
-
-int tratador_de_instrucoes(Lista_ligada **instrucao, Lista_ligada **lista_de_rotulos_desc, char mapa[][13], int *palavra_atual, char *orientacao)
+int tratador_de_instrucoes(Lista_ligada **instrucao, Lista_ligada **lista_de_rotulos_desc, Lista_ligada **mapa, int *palavra_atual, char *orientacao)
 {
-	char *string_do_numero, *arg, *rotulo, *lado;
-	int deslocamento = 0, tamanho;
+	char *string_do_numero, *arg, *rotulo;
+	int tamanho;
 	long int num_decimal;
 	Lista_ligada *argumento = (*instrucao)->prox;
 	int numero_da_instrucao = identifica_instrucao(*instrucao);
-	boolean rotulo_valido;
+	char meia_palavra[12];
 	
 	if (numero_da_instrucao == -1)
 	{
 		return 1;
 	}
 
-	if (*orientacao == 'D')
-	{
-		deslocamento = 5;
-	}
 	string_do_numero = decimal_para_hex(numero_da_instrucao, 2);
 
-	mapa[*palavra_atual][3 + deslocamento] = string_do_numero[0];
-	mapa[*palavra_atual][4 + deslocamento] = string_do_numero[1];
+	meia_palavra[0] = string_do_numero[0];
+	meia_palavra[1] = string_do_numero[1];
 
 	free(string_do_numero);
 
 	// Caso a intrucao nao necessite do campo de memoria (RSH  e LSH).
 	if (numero_da_instrucao == 20 || numero_da_instrucao == 21)
 	{
-		mapa[*palavra_atual][5 + deslocamento] = '0';
-		mapa[*palavra_atual][6 + deslocamento] = '0';
-		mapa[*palavra_atual][7 + deslocamento] = '0';
+		meia_palavra[2] = '0';
+		meia_palavra[3] = '0';
+		meia_palavra[4] = '0';
 	}
 
 	else
 	{
+		// Verifica se ha argumentos para a instrucao.
 		if ((*instrucao)->prox == NULL || (*instrucao)->info != (*instrucao)->prox->info)
 		{	
 			printf("ERROR on line %d\n", (*instrucao)->info);
@@ -57,7 +53,7 @@ int tratador_de_instrucoes(Lista_ligada **instrucao, Lista_ligada **lista_de_rot
 			return 1;	
 		}
 
-		// Atualiza a string da lista ligada.
+		// Atualiza a string da lista ligada, retirando as aspas.
 		argumento->string[tamanho - 2] = '\0';
 		argumento->string = copia_string(argumento->string, 1);
 
@@ -67,31 +63,32 @@ int tratador_de_instrucoes(Lista_ligada **instrucao, Lista_ligada **lista_de_rot
 
 			arg = decimal_para_hex(num_decimal, 3);
 
-			mapa[*palavra_atual][5 + deslocamento] = arg[0];
-			mapa[*palavra_atual][6 + deslocamento] = arg[1];
-			mapa[*palavra_atual][7 + deslocamento] = arg[2];
+			meia_palavra[2] = arg[0];
+			meia_palavra[3] = arg[1];
+			meia_palavra[4] = arg[2];
 		}
+
 		// Verifica se o argumento eh um hexadecimal.
 		else if (verifica_hexadecimal(argumento, 0, 1023, FALSE))
 		{
 			// Ignora o "0x" do numero hexadecimal.
 			arg = copia_string(argumento->string, 2);
 
-			mapa[*palavra_atual][5 + deslocamento] = arg[7];
-			mapa[*palavra_atual][6 + deslocamento] = arg[8];
-			mapa[*palavra_atual][7 + deslocamento] = arg[9];
+			meia_palavra[2] = arg[7];
+			meia_palavra[3] = arg[8];
+			meia_palavra[4] = arg[9];
 		}
 		
 		// Verifica se o argumento eh um rotulo.
 		else if (verifica_rotulo(argumento, FALSE))
 		{
 			rotulo  = copia_string(argumento->string, 0);
-			// Orientacao do rotulo.
-			lado = (char *) malloc(2 * sizeof(char));
-			lado[0] = *orientacao;
-			lado[1] = '\0';
 
-			adiciona_celula(lista_de_rotulos_desc, rotulo, lado, *palavra_atual);
+			adiciona_celula(lista_de_rotulos_desc, rotulo, copia_string(orientacao, 0), *palavra_atual);
+
+			meia_palavra[2] = 'R';
+			meia_palavra[3] = 'R';
+			meia_palavra[4] = 'R';
 		}
 
 		// Caso o argumento seja invalido.
@@ -102,8 +99,11 @@ int tratador_de_instrucoes(Lista_ligada **instrucao, Lista_ligada **lista_de_rot
 			return 1;
 		}
 	}
+		
+		avanca_meia_palavra(mapa, meia_palavra, orientacao, palavra_atual);
+
 		*instrucao = (*instrucao)->prox;
-		avanca_meias_palavra(palavra_atual, orientacao, 1);
+
 		return 0;
 }
 

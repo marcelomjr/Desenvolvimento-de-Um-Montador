@@ -7,7 +7,7 @@
 #include "montador.h"
 
 
-int primeira_montagem(Lista_ligada* programaLM, char mapa[][13])
+int primeira_montagem(Lista_ligada* programaLM, Lista_ligada **mapa)
 {
 	Lista_ligada *apontador;//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>..ELIMINAR
 	
@@ -33,13 +33,16 @@ int primeira_montagem(Lista_ligada* programaLM, char mapa[][13])
 
 	/* Variaveis relacionadas ao mapa de memoria */
 	int palavra_atual = 0;
-	char orientacao = 'E';
+	char orientacao[] = "E";
 
 	// Variaveis auxiliares
 	char caractere;			// Armazena um char do elemento analisado.
 	int posicao;			// indice da posicao atual verificada de um elemento.
 	int num_char; 			// Tamanho de cada elemento.
 	int linha_atual = -1;	// Identificador da linha atual do programa em liguagem de montagem.
+
+	// Criacao de lista ligada para registrar o mapa de memoria.
+	cria_lista(mapa);
 
 	// Criacao de uma lista ligada para registrar os rotulos e seus enderecos.
 	cria_lista(&lista_de_rotulos);
@@ -67,9 +70,8 @@ int primeira_montagem(Lista_ligada* programaLM, char mapa[][13])
 			linha_atual = apontador->info;
 		}
 		
-		// Determina o numero de caracteres na string
-		for (posicao = 0; apontador->string[posicao] != '\0'; posicao++);
-		num_char = posicao;
+		// Determina o numero de caracteres na string sem o '\0'.
+		num_char = getTamanho(apontador->string) - 1;
 
 		elemento_identificado = FALSE;
 		// Percorre a string buscando determinar qual eh o elemento (instrucao, diretiva, etc)
@@ -112,7 +114,7 @@ int primeira_montagem(Lista_ligada* programaLM, char mapa[][13])
 					diretiva = TRUE;
 					elemento_identificado = TRUE;
 
-					if (tratador_de_diretivas(&apontador, &lista_de_simbolos, &lista_de_rotulos_desc, &lista_de_simbolos_desc, &palavra_atual, &align, &orientacao, mapa) == 1)
+					if (tratador_de_diretivas(&apontador, &lista_de_simbolos, &lista_de_rotulos_desc, &lista_de_simbolos_desc, &palavra_atual, &align, orientacao, mapa) == 1)
 					{
 						return 1;
 					}
@@ -130,7 +132,7 @@ int primeira_montagem(Lista_ligada* programaLM, char mapa[][13])
 			// Identificou um rotulo.
 			else if (caractere == ':')
 			{
-				//printf("rotulo%d. Linha: %d\n", rotulo, apontador->info);>>>>>>>>>>>>>>>>>>>>>>>>
+				printf("rotulo na linha %d: %s\n", apontador->info, apontador->string);//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 				if (rotulo)
 				{
 					printf("ERROR on line %d\n", apontador->info);
@@ -154,14 +156,17 @@ int primeira_montagem(Lista_ligada* programaLM, char mapa[][13])
 					if (posicao == (num_char - 1))
 					{
 						// Retira o ':' do rotulo.
-						// apontador->string[num_char - 1] = '\0';>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>VER se precisa ser assim
+						apontador->string[num_char - 1] = '\0';
+
 						rotulo = TRUE;
 						elemento_identificado = TRUE;
-
-						if (registra_rotulo(&lista_de_rotulos, apontador, palavra_atual, orientacao) == 1)
+						printf("rotulo atualizado: [%s]\n", apontador->string);
+						if (!verifica_rotulo(apontador, TRUE))
 						{
 							return 1;
 						}
+						adiciona_celula(&lista_de_rotulos, apontador->string, orientacao, palavra_atual);
+						
 					}
 					else
 					{
@@ -174,13 +179,7 @@ int primeira_montagem(Lista_ligada* programaLM, char mapa[][13])
 		}
 		if (!elemento_identificado)
 		{
-			if (tratador_de_instrucoes(&apontador, &lista_de_rotulos_desc, mapa, &palavra_atual, &orientacao) == 1)
-			{
-				return 1;
-			}
-			else
-			{
-				if (instrucao)
+			if (instrucao)
 				{
 					printf("ERROR on line %d\n", apontador->info);
 					printf("Nao eh possivel haver duas instrucoes em uma mesma linha!\n");
@@ -192,12 +191,20 @@ int primeira_montagem(Lista_ligada* programaLM, char mapa[][13])
 					printf("Nao eh possivel inserir diretivas e instrucoes na mesma linha!\n");
 					return 1;
 				}
-				instrucao = TRUE;	
+
+			printf("Identificou uma instrucao: %s\n", apontador->string);
+			if (tratador_de_instrucoes(&apontador, &lista_de_rotulos_desc, mapa, &palavra_atual, orientacao) == 1)
+			{
+				return 1;
 			}
+
+			instrucao = TRUE;
 		}
 		// Fim da analise de um elemento.
 	}
-	imprime_lista(lista_de_rotulos, 12);//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	printf("\n\nRotulos:\n");
+	imprime_lista(lista_de_rotulos, 123);//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	return 0;
 }
 
 int main(int argc,char *argv[])
@@ -205,7 +212,7 @@ int main(int argc,char *argv[])
 	char* arquivo_de_entrada;
 	char* arquivo_de_saida;
 	Lista_ligada* programaLM;
-	char mapa_de_memoria[1024][13];
+	Lista_ligada *mapa;
 
 	if (verifica_parametros(argc, argv, &arquivo_de_entrada, &arquivo_de_saida) == 1)
 	{
@@ -213,7 +220,6 @@ int main(int argc,char *argv[])
 	}
 
 	programaLM = le_arquivo_de_entrada(arquivo_de_entrada);
-
 	if (programaLM == NULL)
 	{
 		printf("Erro na leitura do arquivo de entrada!\n");
@@ -222,15 +228,16 @@ int main(int argc,char *argv[])
 
 	imprime_lista(programaLM, 1);
 
-	inicializa_mapa(mapa_de_memoria);
-	preenche_enderecos(mapa_de_memoria);
-	
-	
-	if (primeira_montagem(programaLM, mapa_de_memoria) == 1)
+	printf("\n\nprimeira_montagem:\n");
+	if (primeira_montagem(programaLM, &mapa) == 1)
 	{
 		return 0;
 	}
-	imprime_mapa(mapa_de_memoria);
+
+	printf("\n\nMapa de memoria:\n");
+	imprime_mapa(&mapa);
+
+	
 
 	return 0;
 }

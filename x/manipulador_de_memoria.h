@@ -6,10 +6,11 @@
 #include <stdio.h>
 #include "manipulador_de_lista_ligada.h"
 #include "manipulador_de_caracteres.h"
+#include "manipulador_de_conversoes.h"
 
-void avanca_meias_palavra(int *palavra_atual, char *orientacao, int quantidade);
-void imprime_mapa(char mapa[][13]);
-void preenche_enderecos(char mapa[][13]);
-void inicializa_mapa(char mapa[][13]);
+void avanca_meia_palavra(Lista_ligada **mapa, char *palavra, char *orientacao, int *num_palavra);
+int preenche_palavra_n_vezes(Lista_ligada* elemento, char mapa[][13], char *palavra, int palavra_atual, char orientacao, int n);
+void imprime_mapa(Lista_ligada** mapa);
+
 
 #endif

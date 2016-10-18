@@ -1,6 +1,7 @@
 // manipulador_de_lista_ligada.c
 
 #include "manipulador_de_lista_ligada.h"
+#include "manipulador_de_caracteres.h"
 
 /* Cria uma lista ligada vazia.
  * Recebe como parametro o endereco de um ponteiro do tipo Lista_ligada.
@@ -29,8 +30,10 @@ void adiciona_celula(Lista_ligada **lista, char* str1, char* str2, int informaca
 
 	nova_celula->prox = NULL;
 
-	nova_celula->string = str1;
-	nova_celula->string2 = str2;
+	// Insercao dos dados.
+	nova_celula->string = copia_string(str1, 0);
+	nova_celula->string2 = copia_string(str2, 0);
+
 	nova_celula->info = informacao;
 }
 
@@ -65,15 +68,14 @@ void remove_lista(Lista_ligada** lista)
  */
 void imprime_lista(Lista_ligada *lista, int opcao_de_string)
 {
-	int linha_atual = 1;
-	printf("%.2d:", linha_atual);
+	int linha_atual = -1;
 
 	while (lista != NULL)
 	{
 		if (lista->info > linha_atual)
 		{
-			printf("\n");
 			linha_atual = lista->info;
+			printf("\n");
 			printf("%.2d:", linha_atual);
 		}
 		if (opcao_de_string == 1)
@@ -87,6 +89,10 @@ void imprime_lista(Lista_ligada *lista, int opcao_de_string)
 		else if (opcao_de_string == 12)
 		{
 			printf("[%s|%s] ", lista->string, lista->string2);
+		}
+		else if (opcao_de_string == 123)
+		{
+			printf("[%d|%s|%s] ", lista->info, lista->string, lista->string2);
 		}
 		lista = lista->prox;
 	}

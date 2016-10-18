@@ -9,4 +9,7 @@
 #include "manipulador_de_diretivas.h"
 #include "manipulador_de_memoria.h"
 #include "manipulador_de_instrucoes.h"
+#include "manipulador_de_conversoes.h"
+#include "manipulador_de_argumentos.h"
+
 
