@@ -23,7 +23,7 @@ int preenche_palavra_n_vezes(Lista_ligada* elemento, char mapa[][13], char *pala
 {
 	if (orientacao == 'D')
 	{
-		printf("ERROR on line %d\n", elemento->info);
+		printf("ERROR on line %d\n", (int) elemento->info);
 		printf("Nao eh possivel colocar um dado de 40 bits na instrucao a direita da palavra de memoria!\n");
 		return 1;
 	}
@@ -40,18 +40,19 @@ int preenche_palavra_n_vezes(Lista_ligada* elemento, char mapa[][13], char *pala
 
 void imprime_mapa(Lista_ligada** mapa)
 {
+	Lista_ligada *apontador = *mapa;
 	char *endereco;
 	int palavra_atual = -1;
 	Lista_ligada *temp1, *temp2;
 
-	for (; (*mapa) != NULL; (*mapa) = (*mapa)->prox)
+	for (; apontador != NULL; apontador = apontador->prox)
 	{
-		if (palavra_atual < (*mapa)->info)
+		if (palavra_atual < apontador->info)
 		{
 			printf("\n");	
-			endereco = decimal_para_hex((*mapa)->info, 3);
+			endereco = decimal_para_hex(apontador->info, 3);
 			printf("%s ", endereco);
-			palavra_atual = (*mapa)->info;
+			palavra_atual = apontador->info;
 			
 		}
 		
@@ -61,13 +62,13 @@ void imprime_mapa(Lista_ligada** mapa)
 			{
 					printf(" ");
 			}
-			printf("%c", (*mapa)->string[posicao]);
+			printf("%c", apontador->string[posicao]);
 		}
 		// Caso esteja no lado esquerdo.
-		if ((*mapa)->string2[0] == 'E')
+		if (apontador->string2[0] == 'E')
 		{
 			printf(" ");
-			if (((*mapa)->prox == NULL) || ((*mapa)->prox->string2[0] == 'E'))
+			if ((apontador->prox == NULL) || (apontador->prox->string2[0] == 'E'))
 			{
 				printf("00 000");
 			}
@@ -75,15 +76,16 @@ void imprime_mapa(Lista_ligada** mapa)
 		// caso esteja no lado direito.
 		else
 		{
-			if (((*mapa)->prox != NULL) && ((*mapa)->prox->string2[0] == 'D'))
+			if ((apontador->prox != NULL) && (apontador->prox->string2[0] == 'D'))
 			{
 			
-			temp1 = (*mapa);
-			temp2 = (*mapa)->prox;
-			(*mapa)->prox = NULL;
+			temp1 = apontador;
+			temp2 = apontador->prox;
+			apontador->prox = NULL;
 
-			adiciona_celula(mapa, "00000", "E", (*mapa)->prox->info);
-			(*mapa)->prox->prox = temp2;
+			adiciona_celula(mapa, "00000", "E", apontador->prox->info);
+			apontador = temp1;
+			apontador->prox->prox = temp2;
 			}
 		}
 	}

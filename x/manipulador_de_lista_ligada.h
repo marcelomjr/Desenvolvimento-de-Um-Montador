@@ -10,7 +10,7 @@
 
 struct lista
 {
-	int info;
+	long int info;
 	char *string;
 	char *string2;
 	struct lista *prox;

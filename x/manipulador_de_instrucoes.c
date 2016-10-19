@@ -3,7 +3,7 @@
 #include "manipulador_de_instrucoes.h"
 #include "manipulador_de_caracteres.h"
 
-int tratador_de_instrucoes(Lista_ligada **instrucao, Lista_ligada **lista_de_rotulos_desc, Lista_ligada **mapa, int *palavra_atual, char *orientacao)
+int tratador_de_instrucoes(Lista_ligada **instrucao, Lista_ligada **lista_de_desconhecidos, Lista_ligada **mapa, int *palavra_atual, char *orientacao)
 {
 	char *string_do_numero, *arg, *rotulo;
 	int tamanho;
@@ -37,7 +37,7 @@ int tratador_de_instrucoes(Lista_ligada **instrucao, Lista_ligada **lista_de_rot
 		// Verifica se ha argumentos para a instrucao.
 		if ((*instrucao)->prox == NULL || (*instrucao)->info != (*instrucao)->prox->info)
 		{	
-			printf("ERROR on line %d\n", (*instrucao)->info);
+			printf("ERROR on line %d\n", (int) (*instrucao)->info);
 			printf("A instrucao %s necessita de  um argumento!\n", (*instrucao)->string);
 			return 1;
 		}
@@ -48,7 +48,7 @@ int tratador_de_instrucoes(Lista_ligada **instrucao, Lista_ligada **lista_de_rot
 
 		if (argumento->string[0] != '"' || argumento->string[tamanho - 2] != '"')
 		{
-			printf("ERROR on line %d\n", (*instrucao)->info);
+			printf("ERROR on line %d\n", (int) (*instrucao)->info);
 			printf("O argumento de uma instrucao deve ser colocado entre aspas duplas!\n");
 			return 1;	
 		}
@@ -84,7 +84,7 @@ int tratador_de_instrucoes(Lista_ligada **instrucao, Lista_ligada **lista_de_rot
 		{
 			rotulo  = copia_string(argumento->string, 0);
 
-			adiciona_celula(lista_de_rotulos_desc, rotulo, copia_string(orientacao, 0), *palavra_atual);
+			adiciona_celula(lista_de_desconhecidos, rotulo, copia_string(orientacao, 0), *palavra_atual);
 
 			meia_palavra[2] = 'R';
 			meia_palavra[3] = 'R';
@@ -94,7 +94,7 @@ int tratador_de_instrucoes(Lista_ligada **instrucao, Lista_ligada **lista_de_rot
 		// Caso o argumento seja invalido.
 		else
 		{
-			printf("ERROR on line %d\n", (*instrucao)->info);
+			printf("ERROR on line %d\n", (int) (*instrucao)->info);
 			printf("Argumento de instrucao invalido: %s. Utilize decimais (0:1023), hexadecimais ou rotulos!\n", argumento->string);
 			return 1;
 		}
@@ -179,7 +179,7 @@ int identifica_instrucao(Lista_ligada *instrucao)
 	}
 	else
 	{
-		printf("ERROR on line %d\n", instrucao->info);
+		printf("ERROR on line %d\n", (int) instrucao->info);
 		printf("Elemento nao identificado: %s!\n",instrucao->string);
 		return -1;
 	}
