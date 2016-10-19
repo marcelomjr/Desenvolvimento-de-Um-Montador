@@ -38,26 +38,36 @@ int main(int argc,char *argv[])
 	}
 
 	imprime_lista(programaLM, 1);
+	printf("\n");
 
 	if (primeira_montagem(programaLM, &mapa, &lista_de_rotulos, &lista_de_simbolos, &lista_de_desconhecidos) == 1)
 	{
 		return 0;
 	}
 
-	printf("\n\nMapa de memoria:\n");
+	// printf("\n\nMapa de memoria:\n");
+// 
+	// imprime_lista(mapa,123);
+	// imprime_mapa(&mapa);
 
-	imprime_mapa(&mapa);
+	// printf("\n\nLista de desconhecidos\n");
 
-	printf("\n\nLista de desconhecidos\n");
+	// imprime_lista(lista_de_desconhecidos, 123);
 
-	imprime_lista(lista_de_desconhecidos, 123);
-
-	segunda_montagem(&mapa, lista_de_rotulos, lista_de_simbolos, lista_de_desconhecidos);
-
-	printf("\n\nMapa de final:\n");
-
-	imprime_mapa(&mapa);
-
+	if (segunda_montagem(&mapa, lista_de_rotulos, lista_de_simbolos, lista_de_desconhecidos) == 1)
+	{
+		return 1;
+	}
+	
+	if (argc == 3)
+	{
+		grava_arquivo_de_saida(mapa, arquivo_de_saida);	
+	}
+	else
+	{
+		imprime_mapa(&mapa);
+	}
+	
 	return 0;
 }
 
@@ -235,9 +245,7 @@ int primeira_montagem(Lista_ligada* programaLM, Lista_ligada **mapa, Lista_ligad
 
 			printf("Identificou uma instrucao: %s\n", apontador->string);
 
-			printf("palavra_atualsdsd%d\n", palavra_atual);
-
-			if (tratador_de_instrucoes(&apontador, lista_de_desconhecidos, mapa, &palavra_atual, orientacao) == 1)
+			if (tratador_de_instrucoes(&apontador, lista_de_desconhecidos, mapa, &palavra_atual, orientacao, align) == 1)
 			{
 				return 1;
 			}
@@ -258,15 +266,12 @@ int segunda_montagem(Lista_ligada** mapa, Lista_ligada *lista_de_rotulos, Lista_
 	Lista_ligada *apontador = *mapa;
 	Lista_ligada *linha_no_programa; // Para quando nao achar o objeto.
 	int num_palavra;
-	char orientacao;
 	char *objeto;
 	char *numero;
 	boolean achou;
 
 	printf("Estou na sergunda montagem\n");
-	printf("%s\n", lista_de_desconhecidos->string);
 
-	printf("%s\n", apontador->string);
 	// Percorre todo o mapa apenas uma vez completando os simbolos e rotulos desconhecidos.
 	for (;apontador != NULL; apontador = apontador->prox)
 	{
@@ -340,5 +345,85 @@ int segunda_montagem(Lista_ligada** mapa, Lista_ligada *lista_de_rotulos, Lista_
 			}
 
 		}
+		// Verifica se eh  um rotulo faltante
+		else if (apontador->string[2] == 'R')
+		{
+			printf("ultimo\n");
+			num_palavra = apontador->info;
+
+			achou = FALSE;
+			// Procura a palavra por seu identificador na lista de objetos desconhecidos.
+			for (cursor = lista_de_desconhecidos; cursor != NULL && !achou; cursor = cursor->prox)
+			{
+				// Caso tenha encontrado, salva a string do objeto, para procura-lo na lista de rotulos.
+				if (cursor->info == num_palavra)
+				{
+					linha_no_programa = cursor;
+
+					// Salva o objeto
+					objeto = copia_string(cursor->string, 0);
+					achou = TRUE;
+				}
+			}
+
+			if (!achou)
+			{
+				printf("Erro no montador (segunda montagem)\n");
+				return 1;
+			}
+
+			achou = FALSE;
+
+			// Verifica se o objeto esta na lista dos rotulos.
+			for (cursor = lista_de_rotulos; cursor != NULL && !achou; cursor = cursor->prox)
+			{
+				if (compara_strings(objeto, cursor->string) == TRUE)
+				{
+					objeto_encontrado = cursor;
+					achou = TRUE;
+				}
+			}
+			if (!achou)
+			{
+				printf("ERROR on line %d\n", (int) (int) base_string_para_decimal_int(linha_no_programa->string2, 10));
+				printf("O objeto \"%s\"nao foi definido como rotulo nem simbolo!\n", linha_no_programa->string);
+				return 1;
+			}
+			// Caso tenha achado
+			else
+			{
+				numero = decimal_para_hex(objeto_encontrado->info, 3);
+
+				apontador->string[2] = numero[0];
+				apontador->string[3] = numero[1];
+				apontador->string[4] = numero[2];
+
+				/* Por padrao as instrucoes que sao influencias pelo orientacao do rotulo sao setadas para a esquerda.
+				 * Portanto se verificarmos que o seu rotulo aponta para um endereco a direita, devemos alterar para a instrucao correspondente. */
+				if (objeto_encontrado->string2[0] == 'D')
+				{
+					// Instrucao JUMP.
+					if (apontador->string[0] == '0' && apontador->string[1] == 'D')
+					{
+						apontador->string[1] = 'E';
+					}
+					// Instrucao JUMP+
+					else if (apontador->string[1] == '0' && apontador->string[1] == 'F')
+					{
+						apontador->string[0] = '1';
+						apontador->string[1] = '0';
+					}
+					// Instrucao STOR M
+					else if (apontador->string[1] == '1' && apontador->string[1] == '2')
+					{
+						apontador->string[0] = '1';
+						apontador->string[1] = '3';
+					}
+
+				}
+			}
+		}
 	}
+
+	return 0;
 }

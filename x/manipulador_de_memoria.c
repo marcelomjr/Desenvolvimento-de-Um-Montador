@@ -2,40 +2,64 @@
 
 #include "manipulador_de_memoria.h"
 
-void avanca_meia_palavra(Lista_ligada **mapa, char *meia_palavra, char *orientacao, int *num_palavra)
+/*
+ * Oberservacao: Para registar a metade direita de um numero de 40 bits deve-se mandar "D" no argumento char *orientacao.
+ */
+void avanca_meia_palavra(Lista_ligada **mapa, char *meia_palavra, char *orientacao, int *num_palavra, int align, boolean num_40_bits)
 {
-	printf("[%s:%d:%s]\n", meia_palavra, *num_palavra,orientacao);
-	adiciona_celula(mapa, meia_palavra, orientacao, *num_palavra);
 	
-	if (orientacao[0] == 'E')
+	if (align == 0)
 	{
-		orientacao[0] = 'D';	
+		printf("****************************************************************************************\n");
+		adiciona_celula(mapa, meia_palavra, orientacao, *num_palavra);
+
+		if (orientacao[0] == 'E')
+		{
+			orientacao[0] = 'D';	
+		}
+		// Esta na direita
+		else
+		{
+			orientacao[0] = 'E';	
+			(*num_palavra) += 1;
+		}
 	}
+	// align != 0
 	else
 	{
-		printf("num_palavra: %d\n", *num_palavra);
-		*num_palavra += 1;
-		orientacao[0] = 'E';
-	}
-}
-//Recebe como parametro uma string de 10 caracteres.
-int preenche_palavra_n_vezes(Lista_ligada* elemento, char mapa[][13], char *palavra, int palavra_atual, char orientacao, int n)
-{
-	if (orientacao == 'D')
-	{
-		printf("ERROR on line %d\n", (int) elemento->info);
-		printf("Nao eh possivel colocar um dado de 40 bits na instrucao a direita da palavra de memoria!\n");
-		return 1;
-	}
-	while (n >= 0)
-	{
-		for (int posicao = 0; posicao < 10; posicao++)
+		// Verifica se esta a esquerda.
+		if (orientacao[0] == 'E')
 		{
-			mapa[palavra_atual][posicao + 3] = palavra[posicao];
+			adiciona_celula(mapa, meia_palavra, orientacao, *num_palavra);
+
+			if (num_40_bits)
+			{
+				orientacao[0] = 'D';
+			}
+			else
+			{
+				(*num_palavra) += align;
+			}
 		}
-		n--;
+		// Nesse caso esta a direita
+		else
+		{
+			if (!num_40_bits)
+			{
+				orientacao[0] = 'E';
+			}
+
+			adiciona_celula(mapa, meia_palavra, orientacao, *num_palavra);
+
+			if (num_40_bits)
+			{
+				orientacao[0] = 'E';
+				(*num_palavra) += align;
+			}
+		}
+		
+		
 	}
-	return 0;
 }
 
 void imprime_mapa(Lista_ligada** mapa)
@@ -47,7 +71,7 @@ void imprime_mapa(Lista_ligada** mapa)
 
 	for (; apontador != NULL; apontador = apontador->prox)
 	{
-		if (palavra_atual < apontador->info)
+		if (palavra_atual != apontador->info)
 		{
 			printf("\n");	
 			endereco = decimal_para_hex(apontador->info, 3);

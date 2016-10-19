@@ -41,43 +41,42 @@ int tratador_de_diretivas(Lista_ligada **diretiva, Lista_ligada **lista_de_simbo
 	}
 
 	// DIRETIVA ALIGN.
-	// else if (compara_strings((*diretiva)->string, ".align"))
-	// {
-	// 	if ((*diretiva)->prox == NULL || (*diretiva)->info != (*diretiva)->prox->info)
-	// 	{
-	// 		printf("ERROR on line %d\n", (int) (*diretiva)->info);
-	// 		printf("A diretiva .align necessita de  um argumento!\n");
-	// 		return 1;
-	// 	}
+	else if (compara_strings((*diretiva)->string, ".align"))
+	{
+		if ((*diretiva)->prox == NULL || (*diretiva)->info != (*diretiva)->prox->info)
+		{
+			printf("ERROR on line %d\n", (int) (*diretiva)->info);
+			printf("A diretiva .align necessita de  um argumento!\n");
+			return 1;
+		}
 
-	// 	if (trata_align((*diretiva)->prox, align) == 1)
-	// 	{
-	// 		return 1;
-	// 	}
+		if (trata_align((*diretiva)->prox, mapa, align, orientacao, palavra_atual) == 1)
+		{
+			return 1;
+		}
 
-	// 	*diretiva = (*diretiva)->prox;
-	// 	return 0;
-	// }
+		*diretiva = (*diretiva)->prox;
+		return 0;
+	}
 
-	// // DIRETIVA WFILL.
-	// else if (compara_strings((*diretiva)->string, ".wfill"))
-	// {
-	// 	if ((*diretiva)->prox == NULL || (*diretiva)->prox->prox == NULL || (*diretiva)->info != (*diretiva)->prox->info || (*diretiva)->info != (*diretiva)->prox->prox->info)
-	// 	{
-	// 		printf("ERROR on line %d\n", (int) (*diretiva)->info);
-	// 		printf("A diretiva .wfill necessita de dois argumentos!\n");
-	// 		return 1;
-	// 	}
+	// DIRETIVA WFILL.
+	else if (compara_strings((*diretiva)->string, ".wfill"))
+	{
+		if ((*diretiva)->prox == NULL || (*diretiva)->prox->prox == NULL || (*diretiva)->info != (*diretiva)->prox->info || (*diretiva)->info != (*diretiva)->prox->prox->info)
+		{
+			printf("ERROR on line %d\n", (int) (*diretiva)->info);
+			printf("A diretiva .wfill necessita de dois argumentos!\n");
+			return 1;
+		}
+		if (trata_wfill(*diretiva, lista_de_desconhecidos, mapa, palavra_atual, orientacao, *align) == 1)
+		{
+			return 1;
+		}
 
-	// 	if (trata_wfill((*diretiva), lista_de_desconhecidos, mapa, palavra_atual, orientacao) == 1)
-	// 	{
-	// 		return 1;
-	// 	}
+		*diretiva = (*diretiva)->prox->prox;
 
-	// 	*diretiva = (*diretiva)->prox->prox;
-
-	// 	return 0;
-	// }
+		return 0;
+	}
 	// DIRETIVA WORD
 	else if (compara_strings((*diretiva)->string, ".word"))
 	{
@@ -89,7 +88,7 @@ int tratador_de_diretivas(Lista_ligada **diretiva, Lista_ligada **lista_de_simbo
 			return 1;
 		}
 
-		if (trata_word((*diretiva)->prox, lista_de_desconhecidos, mapa, palavra_atual, orientacao) == 1)
+		if (trata_word((*diretiva)->prox, lista_de_desconhecidos, mapa, palavra_atual, orientacao, *align) == 1)
 		{
 			return 1;
 		}
@@ -109,9 +108,7 @@ int trata_set(Lista_ligada *set, Lista_ligada **lista_de_simbolos)
 {
 	Lista_ligada *argumento1 = set->prox;
 	Lista_ligada *argumento2 = set->prox->prox;
-	int tamanho, posicao;
 	long int num_decimal;
-	char *arg1, *arg2;
 
 	// Verifica se o argumento 1 eh um simbolo.
 	if (!verifica_simbolo(argumento1, TRUE))
@@ -141,12 +138,13 @@ int trata_set(Lista_ligada *set, Lista_ligada **lista_de_simbolos)
 int trata_org(Lista_ligada *argumento1, int *palavra_atual)
 {
 	long int num_decimal;
-	int posicao;
 	char *arg1;
 
 	if (verifica_decimal (argumento1, 0, 1023, &num_decimal, FALSE))
 	{
 		*palavra_atual = num_decimal;
+
+		return 0;
 	}
 	else if (verifica_hexadecimal(argumento1, 0, 1023, FALSE))
 	{
@@ -156,6 +154,8 @@ int trata_org(Lista_ligada *argumento1, int *palavra_atual)
 		num_decimal = base_string_para_decimal_int(arg1, 16);
 
 		*palavra_atual = num_decimal;
+
+		return 0;
 	}
 	else
 	{
@@ -165,102 +165,147 @@ int trata_org(Lista_ligada *argumento1, int *palavra_atual)
 	}
 }
 
-// int trata_align(Lista_ligada *argumento1, int *align)
-// {
-// 	int num_decimal;
+int trata_align(Lista_ligada *argumento1,Lista_ligada **mapa, int *align, char *orientacao, int *num_palavra)
+{
+	long int num_decimal;
+	int temp;
 
-// 	if (!verifica_decimal(argumento1, 1, 1023, &num_decimal, FALSE))
-// 	{
-// 		return 1;
-// 	}
-// 	else
-// 	{
-// 		printf("ERROR on line %d\n", (int) argumento1->info);
-// 		printf("Parametro de .align deve ser um decimal inteiro entre 1 e 1023!\n");
-// 		return 1;
-// 	}
-// 	*align = num_decimal;
-// }
+	if (verifica_decimal(argumento1, 1, 1023, &num_decimal, FALSE))
+	{
+		if (orientacao[0] == 'D')
+		{
+			orientacao[0] = 'E';	
+		}
+		printf("palavra antes de alinhar: %d\n", *num_palavra);
+		(*align) = num_decimal;
 
-// int trata_wfill(Lista_ligada *wfill, Lista_ligada **lista_de_desconhecidos, char mapa[][13], int *palavra_atual, char *orientacao)
-// {
-// 	Lista_ligada *argumento1 = wfill->prox;
-// 	Lista_ligada *argumento2 = wfill->prox->prox;
+		if ((*num_palavra) == 0 || (*num_palavra) % (*align) != 0)
+		{
+			if (*num_palavra < (*align))
+			{
+				*num_palavra = (*align);
+			}
+			else if (*num_palavra > (*align))
+			{
+				temp = (int) (*num_palavra) / (*align);
+				temp++;
+				(*num_palavra) = temp * (*align);
+			}
+		}
 
-// 	int tamanho, posicao;
-// 	int num_decimal1 = -1, num_decimal2 = -1;
-// 	char *arg1, *arg2 = NULL;
+		printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>palvara alinhasda: %d\n", *num_palavra);
+		return 0;
+	}
+	else
+	{
+		printf("ERROR on line %d\n", (int) argumento1->info);
+		printf("Parametro de .align deve ser um decimal inteiro entre 1 e 1023!\n");
+		return 1;
+	}
+	
+}
 
-// 	// Verifica se o primeiro argumento eh valido.
-// 	if (!verifica_decimal (argumento1, 1, 1023, &num_decimal1, TRUE))
-// 	{
-// 		return 1;
-// 	}
+int trata_wfill(Lista_ligada *wfill, Lista_ligada **lista_de_desconhecidos, Lista_ligada **mapa, int *palavra_atual, char *orientacao, int align)
+{
+	Lista_ligada *argumento1 = wfill->prox;
+	Lista_ligada *argumento2 = wfill->prox->prox;
+	char meia_palavra1[6];
+	char meia_palavra2[6];
+	boolean argumento_valido = FALSE, rotulo_ou_simbolo = FALSE;
+	long int num_decimal1, num_decimal2;
+	char *numero_da_linha, *arg2;
+	int contador;
 
-// 	// Verifica se o segundo argumento eh um hexadecimal.
-// 	if (verifica_hexadecimal(argumento2, FALSE))
-// 	{
-// 		// Nao precisa deixar espaco para o "0x".
-// 		arg2 = copia_string(argumento2->string, 2);			
+	// Verifica se o primeiro argumento eh valido.
+	if (!verifica_decimal (argumento1, 1, 1023, &num_decimal1, TRUE))
+	{
+		return 1;
+	}
 
-// 		if (preenche_palavra_n_vezes(argumento2, mapa, arg2, *palavra_atual, *orientacao, num_decimal1) == 1)
-// 		{
-// 			return 1;
-// 		}
-// 	}
-// 	// Verifica se o segundo argumento eh um decimal.
-// 	else if (verifica_decimal (argumento2, -2147483648, 2147483647, &num_decimal2, FALSE))
-// 	{	
-// 		arg2 = decimal_para_hex(num_decimal2, 10);
+	// Verifica se o segundo argumento eh um hexadecimal.
+	if (verifica_hexadecimal(argumento2, -2147483648, 2147483647, FALSE))
+	{
+		// Nao precisa deixar espaco para o "0x".
+		arg2 = copia_string(argumento2->string, 2);			
 
-// 		if (preenche_palavra_n_vezes(argumento2, mapa, arg2, *palavra_atual, *orientacao, num_decimal1) == 1)
-// 		{
-// 			return 1;
-// 		}
-// 	}
-// 	// Verifica se o segundo argumento eh um rotulo.
-// 	else if (verifica_rotulo(argumento2, FALSE) || verifica_simbolo(argumento2, FALSE))
-// 	{
-// 		arg2 = (char *) malloc(11 * sizeof(char));
+		// Ignora o "0x" do numero hexadecimal.
+		quebra_string(arg2, meia_palavra1, meia_palavra2);
 
-// 		for (posicao = 0; posicao < 10; posicao++)
-// 		{
-// 			arg2[posicao] = '?';
-// 		}
-// 		arg2[10] = '\0';
-// 		// Marca essas palavras para sabermos que elas deverao ser alteradas.
-// 		if (preenche_palavra_n_vezes(argumento2, mapa, arg2, *palavra_atual, *orientacao, num_decimal1) == 1)
-// 		{
-// 			return 1;
-// 		}
+		free(arg2);
 
-// 		return 0;
-// 	}
-// 	else
-// 	{
-// 		printf("ERROR on line %d\n", (int) argumento2->info);
-// 		printf("Argumento invalido para a diretiva .wfill!\n");
-// 		return 1;
-// 	}
+		argumento_valido = TRUE;
+	}
+	// Verifica se o segundo argumento eh um decimal.
+	else if (verifica_decimal (argumento2, -2147483648, 2147483647, &num_decimal2, FALSE))
+	{	
+		arg2 = decimal_para_hex(num_decimal2, 10);
 
-// 	palavra_atual += num_decimal1;
-// 	return 0;
+		quebra_string(arg2, meia_palavra1, meia_palavra2);
 
-// }
+		argumento_valido = TRUE;
+	}
+	// Verifica se o segundo argumento eh um rotulo.
+	else if (verifica_rotulo(argumento2, FALSE) || verifica_simbolo(argumento2, FALSE))
+	{
+		for (contador = 0; contador < 5; contador++)
+		{
+			meia_palavra1[contador] = '?';
+			meia_palavra2[contador] = '?';
+		}
 
-int trata_word(Lista_ligada *argumento1, Lista_ligada **lista_de_desconhecidos, Lista_ligada **mapa, int *palavra_atual, char *orientacao)
+		meia_palavra1[contador] = '\0';
+		meia_palavra2[contador] = '\0';
+
+		rotulo_ou_simbolo = TRUE;
+		argumento_valido = TRUE;
+	}
+
+	if (argumento_valido)
+	{
+		for (contador = 0; contador < num_decimal1; contador++)
+		{
+			if (rotulo_ou_simbolo)
+			{
+				// Salva o numero da linha para indicar erro caso nao identique o objeto como simbolo ou rotulo existente.
+				numero_da_linha = decimal_para_hex(argumento2->info, 4);
+
+				// Salva o objeto na lista dos simbolos desconhecidos.
+				// Salvando o objeto em string, o numero da linha do programa em string2 e o numero da palavra de memoria em info da lista ligada.
+				adiciona_celula(lista_de_desconhecidos, argumento2->string, numero_da_linha, *palavra_atual);
+
+				free(numero_da_linha);
+
+			}
+			avanca_meia_palavra(mapa, meia_palavra1, orientacao, palavra_atual, align, TRUE);
+			// Como verifiquei que o orientacao era a esquerda, tenho certeza que posso colocar a outra metade a direita.
+			avanca_meia_palavra(mapa, meia_palavra2, orientacao, palavra_atual, align, TRUE);
+		}
+
+		return 0;
+	}
+
+	else
+	{
+		printf("ERROR on line %d\n", (int) argumento2->info);
+		printf("Argumento invalido para a diretiva .wfill!\n");
+		return 1;
+	}
+}
+
+int trata_word(Lista_ligada *argumento1, Lista_ligada **lista_de_desconhecidos, Lista_ligada **mapa, int *palavra_atual, char *orientacao, int align)
 {
 	long int num_decimal;
 	char *numero_da_linha;
 	boolean argumento_valido = FALSE;
-	char meia_palavra1[11];
-	char meia_palavra2[11];
+	char meia_palavra1[6];
+	char meia_palavra2[6];
 	char *palavara_inteira;
 
 	if (orientacao[0] == 'D')
 	{
 		printf("ERROR on line %d\n", (int) argumento1->info);
 		printf("A diretiva .word nao pode ser utilizada quando se esta no lado direito da palavra de memoria!\n");
+		return 1;
 	}
 
 	// Verifica se o argumento eh um decimal.
@@ -311,8 +356,9 @@ int trata_word(Lista_ligada *argumento1, Lista_ligada **lista_de_desconhecidos, 
 
 	if (argumento_valido)
 	{
-		avanca_meia_palavra(mapa, meia_palavra1, orientacao, palavra_atual);
-		avanca_meia_palavra(mapa, meia_palavra2, orientacao, palavra_atual);
+		avanca_meia_palavra(mapa, meia_palavra1, orientacao, palavra_atual, align, TRUE);
+		// Como verifiquei que o orientacao era a esquerda, tenho certeza que posso colocar a outra metade a direita.
+		avanca_meia_palavra(mapa, meia_palavra2, orientacao, palavra_atual, align, TRUE);
 	}
 	else
 	{

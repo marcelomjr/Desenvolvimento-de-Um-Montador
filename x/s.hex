@@ -1,0 +1,8 @@
+.org 1020
+.word 1010
+ADD "0"
+banana: .org 100
+.org 200
+JMP "banana"
+
+

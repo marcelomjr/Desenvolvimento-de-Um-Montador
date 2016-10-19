@@ -119,3 +119,51 @@ Lista_ligada* le_arquivo_de_entrada(char* arquivo_de_entrada)
 
 	return programa;
 }
+
+void grava_arquivo_de_saida(Lista_ligada *mapa, char *arquivo_de_saida)
+{
+	FILE *ponteiro_de_saida;
+	int palavra_atual = -1;
+	char *endereco;
+
+	ponteiro_de_saida = fopen(arquivo_de_saida, "w");
+
+
+	if (ponteiro_de_saida == NULL)
+	{
+		fprintf("Erro ao abrir o arquivo de saida: %s\n", arquivo_de_saida);
+		return;
+	}
+
+	for (; mapa != NULL; mapa = mapa->prox)
+	{
+		if (palavra_atual != mapa->info)
+		{
+			endereco = decimal_para_hex(mapa->info, 3);
+			fprintf(ponteiro_de_saida, "%s ", endereco);
+			palavra_atual = mapa->info;
+		}
+		
+		for (int posicao = 0; posicao < 5; posicao++)
+		{
+			if (posicao == 2)
+			{
+				fprintf(ponteiro_de_saida, " ");
+			}
+			fprintf(ponteiro_de_saida, "%c", mapa->string[posicao]);
+		}
+		// Caso esteja no lado esquerdo.
+		if (mapa->string2[0] == 'E')
+		{
+			fprintf(ponteiro_de_saida, " ");
+		}
+		// lado direito.
+		else
+		{
+			fprintf(ponteiro_de_saida, "\n");	
+
+		}
+	}
+
+	fclose(ponteiro_de_saida);
+}

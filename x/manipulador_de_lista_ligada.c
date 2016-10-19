@@ -72,7 +72,7 @@ void imprime_lista(Lista_ligada *lista, int opcao_de_string)
 
 	while (lista != NULL)
 	{
-		if (lista->info > linha_atual)
+		if (lista->info != linha_atual)
 		{
 			linha_atual = lista->info;
 			printf("\n");
@@ -92,7 +92,7 @@ void imprime_lista(Lista_ligada *lista, int opcao_de_string)
 		}
 		else if (opcao_de_string == 123)
 		{
-			printf("[%d|%s|%s] ", lista->info, lista->string, lista->string2);
+			printf("[%ld|%s|%s] ", lista->info, lista->string, lista->string2);
 		}
 		lista = lista->prox;
 	}

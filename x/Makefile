@@ -6,7 +6,7 @@ compila:
 	rm -rf *.o
 
 executa: compila
-	./montador prog.hex
+	./montador prog.hex saida.hex
 	
 gdb: compila
-	gdb montador
+	gdb montador 
