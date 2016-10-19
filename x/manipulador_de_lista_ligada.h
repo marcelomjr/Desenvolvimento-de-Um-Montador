@@ -16,6 +16,8 @@ struct lista
 	struct lista *prox;
 } typedef Lista_ligada;
 
+extern FILE* saida;
+
 void cria_lista(Lista_ligada **lista);
 
 void adiciona_celula(Lista_ligada **lista, char* str1, char* str2, int informacao);

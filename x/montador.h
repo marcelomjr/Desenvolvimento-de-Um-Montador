@@ -1,3 +1,7 @@
+#ifndef MONTADOR_H
+
+#define MONTADOR_H
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -14,3 +18,7 @@
 
 int primeira_montagem(Lista_ligada* programaLM, Lista_ligada **mapa, Lista_ligada **lista_de_rotulos, Lista_ligada **lista_de_simbolos, Lista_ligada **lista_de_desconhecidos);
 int segunda_montagem(Lista_ligada** mapa, Lista_ligada *lista_de_rotulos, Lista_ligada *lista_de_simbolos, Lista_ligada *lista_de_desconhecidos);
+
+FILE* saida;
+
+#endif

@@ -1,12 +1,16 @@
-vetor1:
-vetor2:   .word 10
-vetor3:   .word 10 # Comentario apos diretiva
-
-.word 10
-.word 10  # Comentario apos diretiva
-# Comentario sozinho  
-
-vetor4: ADD "0x0000000100"
-vetor5: ADD "0x0000000100" # Comentario apos instrucao
-
-ADD "0x0000000100"
+inicio:
+LD "10"
+LD- "10"
+LD| "10"
+LD| "10"
+LDmq_mx "10"
+ST "10"
+ADD "inicio"
+ADD| "10"
+SUB "0x000000000A"
+SUB| "0x000000000A" 
+MUL "0x000000000A" 
+DIV "0x000000000A" 
+RSH
+LSH
+ADD| "10"

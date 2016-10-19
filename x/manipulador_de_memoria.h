@@ -13,5 +13,6 @@ void avanca_meia_palavra(Lista_ligada **mapa, char *meia_palavra, char *orientac
 int preenche_palavra_n_vezes(Lista_ligada* elemento, char mapa[][13], char *palavra, int palavra_atual, char orientacao, int n);
 void imprime_mapa(Lista_ligada** mapa);
 
+extern FILE* saida;
 
 #endif

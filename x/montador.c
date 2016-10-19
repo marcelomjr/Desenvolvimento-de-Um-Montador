@@ -29,44 +29,40 @@ int main(int argc,char *argv[])
 		return 0;
 	}
 
+	// Faz com que tudo seja escrito no arquivo.
+	if (argc == 3)
+	{
+		saida = get_arquivo_de_escrita(arquivo_de_saida);;
+
+	}
+	else
+	{
+		saida = stdout;	
+	}
+
 	programaLM = le_arquivo_de_entrada(arquivo_de_entrada);
 
 	if (programaLM == NULL)
 	{
-		printf("Erro na leitura do arquivo de entrada!\n");
+		fprintf(saida, "Erro na leitura do arquivo de entrada!\n");
 		return 0;
 	}
 
-	imprime_lista(programaLM, 1);
-	printf("\n");
+	// imprime_lista(programaLM, 1);
 
 	if (primeira_montagem(programaLM, &mapa, &lista_de_rotulos, &lista_de_simbolos, &lista_de_desconhecidos) == 1)
 	{
 		return 0;
 	}
-
-	// printf("\n\nMapa de memoria:\n");
-// 
+	
 	// imprime_lista(mapa,123);
-	// imprime_mapa(&mapa);
-
-	// printf("\n\nLista de desconhecidos\n");
-
-	// imprime_lista(lista_de_desconhecidos, 123);
 
 	if (segunda_montagem(&mapa, lista_de_rotulos, lista_de_simbolos, lista_de_desconhecidos) == 1)
 	{
 		return 1;
 	}
 	
-	if (argc == 3)
-	{
-		grava_arquivo_de_saida(mapa, arquivo_de_saida);	
-	}
-	else
-	{
-		imprime_mapa(&mapa);
-	}
+	grava_arquivo_de_saida(mapa);	
 	
 	return 0;
 }
@@ -140,8 +136,8 @@ int primeira_montagem(Lista_ligada* programaLM, Lista_ligada **mapa, Lista_ligad
 				}
 				else
 				{
-					printf("ERROR on line %d\n", (int) apontador->info);
-					printf("Comentario invalido!\n");
+					fprintf(saida, "ERROR on line %d\n", (int) apontador->info);
+					fprintf(saida, "Comentario invalido!\n");
 					return 1;
 				}
 			}
@@ -150,14 +146,14 @@ int primeira_montagem(Lista_ligada* programaLM, Lista_ligada **mapa, Lista_ligad
 			{
 				if (diretiva)
 				{
-					printf("ERROR on line %d\n", (int) apontador->info);
-					printf("Nao eh permitido mais de uma diretiva por linha!\n");
+					fprintf(saida, "ERROR on line %d\n", (int) apontador->info);
+					fprintf(saida, "Nao eh permitido mais de uma diretiva por linha!\n");
 					return 1;	
 				}
 				if (instrucao)
 				{
-					printf("ERROR on line %d\n", (int) apontador->info);
-					printf("Diretivas e instrucoes nao podem ser utilizadas na mesma linha!\n");
+					fprintf(saida, "ERROR on line %d\n", (int) apontador->info);
+					fprintf(saida, "Diretivas e instrucoes nao podem ser utilizadas na mesma linha!\n");
 					return 1;
 				}	
 				if (posicao == 0)
@@ -169,13 +165,11 @@ int primeira_montagem(Lista_ligada* programaLM, Lista_ligada **mapa, Lista_ligad
 					{
 						return 1;
 					}
-					printf("Diretiva ok na linha: %d\n",(int) apontador->info);
-
 				}
 				else
 				{
-					printf("ERROR on line %d\n", (int) apontador->info);
-					printf("Diretiva invalida!\n");
+					fprintf(saida, "ERROR on line %d\n", (int) apontador->info);
+					fprintf(saida, "Diretiva invalida!\n");
 					return 1;
 				}
 			}
@@ -183,23 +177,22 @@ int primeira_montagem(Lista_ligada* programaLM, Lista_ligada **mapa, Lista_ligad
 			// Identificou um rotulo.
 			else if (caractere == ':')
 			{
-				printf("rotulo na linha %d: %s\n", (int) apontador->info, apontador->string);//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 				if (rotulo)
 				{
-					printf("ERROR on line %d\n", (int) apontador->info);
-					printf("Nao eh possivel haver dois rotulos em uma mesma linha!\n");
+					fprintf(saida, "ERROR on line %d\n", (int) apontador->info);
+					fprintf(saida, "Nao eh possivel haver dois rotulos em uma mesma linha!\n");
 					return 1;
 				}
 				else if (diretiva)
 				{	
-					printf("ERROR on line %d\n", (int) apontador->info);
-					printf("Nao eh possivel inserir rotulos apos diretivas!\n");
+					fprintf(saida, "ERROR on line %d\n", (int) apontador->info);
+					fprintf(saida, "Nao eh possivel inserir rotulos apos diretivas!\n");
 					return 1;
 				}
 				else if (instrucao)
 				{
-					printf("ERROR on line %d\n", (int) apontador->info);
-					printf("Nao eh possivel inserir instrucoes apos diretivas!\n");
+					fprintf(saida, "ERROR on line %d\n", (int) apontador->info);
+					fprintf(saida, "Nao eh possivel inserir instrucoes apos diretivas!\n");
 					return 1;
 				}
 				else
@@ -211,7 +204,7 @@ int primeira_montagem(Lista_ligada* programaLM, Lista_ligada **mapa, Lista_ligad
 
 						rotulo = TRUE;
 						elemento_identificado = TRUE;
-						printf("rotulo atualizado: [%s]\n", apontador->string);
+
 						if (!verifica_rotulo(apontador, TRUE))
 						{
 							return 1;
@@ -221,8 +214,8 @@ int primeira_montagem(Lista_ligada* programaLM, Lista_ligada **mapa, Lista_ligad
 					}
 					else
 					{
-						printf("ERROR on line %d\n", (int) apontador->info);
-						printf("Rotulo invalido!\n");
+						fprintf(saida, "ERROR on line %d\n", (int) apontador->info);
+						fprintf(saida, "Rotulo invalido!\n");
 						return 1;
 					}
 				}
@@ -232,18 +225,16 @@ int primeira_montagem(Lista_ligada* programaLM, Lista_ligada **mapa, Lista_ligad
 		{
 			if (instrucao)
 				{
-					printf("ERROR on line %d\n", (int) apontador->info);
-					printf("Nao eh possivel haver duas instrucoes em uma mesma linha!\n");
+					fprintf(saida, "ERROR on line %d\n", (int) apontador->info);
+					fprintf(saida, "Nao eh possivel haver duas instrucoes em uma mesma linha!\n");
 					return 1;
 				}
 				if (diretiva)
 				{
-					printf("ERROR on line %d\n", (int) apontador->info);
-					printf("Nao eh possivel inserir diretivas e instrucoes na mesma linha!\n");
+					fprintf(saida, "ERROR on line %d\n", (int) apontador->info);
+					fprintf(saida, "Nao eh possivel inserir diretivas e instrucoes na mesma linha!\n");
 					return 1;
 				}
-
-			printf("Identificou uma instrucao: %s\n", apontador->string);
 
 			if (tratador_de_instrucoes(&apontador, lista_de_desconhecidos, mapa, &palavra_atual, orientacao, align) == 1)
 			{
@@ -254,8 +245,6 @@ int primeira_montagem(Lista_ligada* programaLM, Lista_ligada **mapa, Lista_ligad
 		}
 		// Fim da analise de um elemento.
 	}
-	printf("\n\nRotulos:\n");
-	imprime_lista(*lista_de_rotulos, 123);//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	
 	return 0;
 }
@@ -270,15 +259,11 @@ int segunda_montagem(Lista_ligada** mapa, Lista_ligada *lista_de_rotulos, Lista_
 	char *numero;
 	boolean achou;
 
-	printf("Estou na sergunda montagem\n");
-
 	// Percorre todo o mapa apenas uma vez completando os simbolos e rotulos desconhecidos.
 	for (;apontador != NULL; apontador = apontador->prox)
 	{
-		printf("enrou no foor\n");
 		if (apontador->string2[0] == 'E' && apontador->string[0] == '?')
 		{
-			printf("entrou no if: %d\n",(int) apontador->info );
 			num_palavra = apontador->info;
 
 			achou = FALSE;
@@ -298,7 +283,7 @@ int segunda_montagem(Lista_ligada** mapa, Lista_ligada *lista_de_rotulos, Lista_
 
 			if (!achou)
 			{
-				printf("Erro no montador (segunda montagem)\n");
+				fprintf(saida, "Erro no montador (segunda montagem)\n");
 				return 1;
 			}
 
@@ -327,8 +312,8 @@ int segunda_montagem(Lista_ligada** mapa, Lista_ligada *lista_de_rotulos, Lista_
 			}
 			if (!achou)
 			{
-				printf("ERROR on line %d\n", (int) (int) base_string_para_decimal_int(linha_no_programa->string2, 10));
-				printf("O objeto \"%s\"nao foi definido como rotulo nem simbolo!\n", linha_no_programa->string);
+				fprintf(saida, "ERROR on line %d\n", (int) (int) base_string_para_decimal_int(linha_no_programa->string2, 10));
+				fprintf(saida, "O objeto \"%s\"nao foi definido como rotulo nem simbolo!\n", linha_no_programa->string);
 				return 1;
 			}
 			// Caso tenha achado
@@ -348,7 +333,6 @@ int segunda_montagem(Lista_ligada** mapa, Lista_ligada *lista_de_rotulos, Lista_
 		// Verifica se eh  um rotulo faltante
 		else if (apontador->string[2] == 'R')
 		{
-			printf("ultimo\n");
 			num_palavra = apontador->info;
 
 			achou = FALSE;
@@ -368,7 +352,7 @@ int segunda_montagem(Lista_ligada** mapa, Lista_ligada *lista_de_rotulos, Lista_
 
 			if (!achou)
 			{
-				printf("Erro no montador (segunda montagem)\n");
+				fprintf(saida, "Erro no montador (segunda montagem)\n");
 				return 1;
 			}
 
@@ -385,8 +369,8 @@ int segunda_montagem(Lista_ligada** mapa, Lista_ligada *lista_de_rotulos, Lista_
 			}
 			if (!achou)
 			{
-				printf("ERROR on line %d\n", (int) (int) base_string_para_decimal_int(linha_no_programa->string2, 10));
-				printf("O objeto \"%s\"nao foi definido como rotulo nem simbolo!\n", linha_no_programa->string);
+				fprintf(saida, "ERROR on line %d\n", (int) (int) base_string_para_decimal_int(linha_no_programa->string2, 10));
+				fprintf(saida, "O objeto \"%s\"nao foi definido como rotulo nem simbolo!\n", linha_no_programa->string);
 				return 1;
 			}
 			// Caso tenha achado

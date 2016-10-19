@@ -11,6 +11,8 @@
 #include "manipulador_de_argumentos.h"
 #include "manipulador_de_conversoes.h"
 
+extern FILE* saida;
+
 int tratador_de_diretivas(Lista_ligada **diretiva, Lista_ligada **lista_de_simbolos, Lista_ligada **lista_de_desconhecidos, int *palavra_atual, int *align, char *orientacao, Lista_ligada **mapa);
 int trata_set(Lista_ligada *set, Lista_ligada **lista_de_simbolos);
 int trata_org(Lista_ligada *argumento1, int *palavra_atual);

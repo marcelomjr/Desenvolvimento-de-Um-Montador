@@ -7,8 +7,8 @@ int tratador_de_diretivas(Lista_ligada **diretiva, Lista_ligada **lista_de_simbo
 	{
 		if ((*diretiva)->prox == NULL || (*diretiva)->prox->prox == NULL || (*diretiva)->info != (*diretiva)->prox->info || (*diretiva)->info != (*diretiva)->prox->prox->info)
 		{
-			printf("ERROR on line %d\n", (int) (*diretiva)->info);
-			printf("A diretiva .set necessita de dois argumentos!\n");
+			fprintf(saida, "ERROR on line %d\n", (int) (*diretiva)->info);
+			fprintf(saida, "A diretiva .set necessita de dois argumentos!\n");
 			return 1;
 		}
 
@@ -26,8 +26,8 @@ int tratador_de_diretivas(Lista_ligada **diretiva, Lista_ligada **lista_de_simbo
 	{
 		if ((*diretiva)->prox == NULL || (*diretiva)->info != (*diretiva)->prox->info)
 		{
-			printf("ERROR on line %d\n", (int) (*diretiva)->info);
-			printf("A diretiva .org necessita de  um argumento!\n");
+			fprintf(saida, "ERROR on line %d\n", (int) (*diretiva)->info);
+			fprintf(saida, "A diretiva .org necessita de  um argumento!\n");
 			return 1;
 		}
 
@@ -45,8 +45,8 @@ int tratador_de_diretivas(Lista_ligada **diretiva, Lista_ligada **lista_de_simbo
 	{
 		if ((*diretiva)->prox == NULL || (*diretiva)->info != (*diretiva)->prox->info)
 		{
-			printf("ERROR on line %d\n", (int) (*diretiva)->info);
-			printf("A diretiva .align necessita de  um argumento!\n");
+			fprintf(saida, "ERROR on line %d\n", (int) (*diretiva)->info);
+			fprintf(saida, "A diretiva .align necessita de  um argumento!\n");
 			return 1;
 		}
 
@@ -64,8 +64,8 @@ int tratador_de_diretivas(Lista_ligada **diretiva, Lista_ligada **lista_de_simbo
 	{
 		if ((*diretiva)->prox == NULL || (*diretiva)->prox->prox == NULL || (*diretiva)->info != (*diretiva)->prox->info || (*diretiva)->info != (*diretiva)->prox->prox->info)
 		{
-			printf("ERROR on line %d\n", (int) (*diretiva)->info);
-			printf("A diretiva .wfill necessita de dois argumentos!\n");
+			fprintf(saida, "ERROR on line %d\n", (int) (*diretiva)->info);
+			fprintf(saida, "A diretiva .wfill necessita de dois argumentos!\n");
 			return 1;
 		}
 		if (trata_wfill(*diretiva, lista_de_desconhecidos, mapa, palavra_atual, orientacao, *align) == 1)
@@ -83,8 +83,8 @@ int tratador_de_diretivas(Lista_ligada **diretiva, Lista_ligada **lista_de_simbo
 
 		if ((*diretiva)->prox == NULL || (*diretiva)->info != (*diretiva)->prox->info)
 		{	
-			printf("ERROR on line %d\n", (int) (*diretiva)->info);
-			printf("A diretiva .word necessita de  um argumento!\n");
+			fprintf(saida, "ERROR on line %d\n", (int) (*diretiva)->info);
+			fprintf(saida, "A diretiva .word necessita de  um argumento!\n");
 			return 1;
 		}
 
@@ -98,8 +98,8 @@ int tratador_de_diretivas(Lista_ligada **diretiva, Lista_ligada **lista_de_simbo
 	}
 	else
 	{
-		printf("ERROR on line %d\n", (int) (*diretiva)->info);
-		printf("Diretiva inexistente!\n");
+		fprintf(saida, "ERROR on line %d\n", (int) (*diretiva)->info);
+		fprintf(saida, "Diretiva inexistente!\n");
 		return 1;
 	}
 }
@@ -110,6 +110,7 @@ int trata_set(Lista_ligada *set, Lista_ligada **lista_de_simbolos)
 	Lista_ligada *argumento2 = set->prox->prox;
 	long int num_decimal;
 
+	fprintf(saida, "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n");
 	// Verifica se o argumento 1 eh um simbolo.
 	if (!verifica_simbolo(argumento1, TRUE))
 	{
@@ -125,8 +126,8 @@ int trata_set(Lista_ligada *set, Lista_ligada **lista_de_simbolos)
 	}
 	else if (!verifica_decimal (argumento2, 0, 2147483647 , &num_decimal, FALSE))
 	{
-		printf("ERROR on line %d\n", (int) argumento2->info);
-		printf("Argumento 2 invalido para a diretiva .set!\n");
+		fprintf(saida, "ERROR on line %d\n", (int) argumento2->info);
+		fprintf(saida, "Argumento 2 invalido para a diretiva .set!\n");
 		return 1;
 	}
 	
@@ -154,13 +155,14 @@ int trata_org(Lista_ligada *argumento1, int *palavra_atual)
 		num_decimal = base_string_para_decimal_int(arg1, 16);
 
 		*palavra_atual = num_decimal;
+		// orientacao = 'E'talvez resolvaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
 		return 0;
 	}
 	else
 	{
-		printf("ERROR on line %d\n", (int) argumento1->info);
-		printf("O argumento da diretiva .org deve ser um decimal(0:123) ou hexadecimal (Ex: 0x0000000000)!\n");
+		fprintf(saida, "ERROR on line %d\n", (int) argumento1->info);
+		fprintf(saida, "O argumento da diretiva .org deve ser um decimal(0:123) ou hexadecimal (Ex: 0x0000000000)!\n");
 		return 1;
 	}
 }
@@ -176,7 +178,7 @@ int trata_align(Lista_ligada *argumento1,Lista_ligada **mapa, int *align, char *
 		{
 			orientacao[0] = 'E';	
 		}
-		printf("palavra antes de alinhar: %d\n", *num_palavra);
+
 		(*align) = num_decimal;
 
 		if ((*num_palavra) == 0 || (*num_palavra) % (*align) != 0)
@@ -193,13 +195,12 @@ int trata_align(Lista_ligada *argumento1,Lista_ligada **mapa, int *align, char *
 			}
 		}
 
-		printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>palvara alinhasda: %d\n", *num_palavra);
 		return 0;
 	}
 	else
 	{
-		printf("ERROR on line %d\n", (int) argumento1->info);
-		printf("Parametro de .align deve ser um decimal inteiro entre 1 e 1023!\n");
+		fprintf(saida, "ERROR on line %d\n", (int) argumento1->info);
+		fprintf(saida, "Parametro de .align deve ser um decimal inteiro entre 1 e 1023!\n");
 		return 1;
 	}
 	
@@ -215,6 +216,13 @@ int trata_wfill(Lista_ligada *wfill, Lista_ligada **lista_de_desconhecidos, List
 	long int num_decimal1, num_decimal2;
 	char *numero_da_linha, *arg2;
 	int contador;
+
+	if (orientacao[0] == 'D')
+	{
+		fprintf(saida, "ERROR on line %d\n", (int) argumento1->info);
+		fprintf(saida, "A diretiva .wfill nao pode ser utilizada quando se esta no lado direito da palavra de memoria!\n");
+		return 1;
+	}
 
 	// Verifica se o primeiro argumento eh valido.
 	if (!verifica_decimal (argumento1, 1, 1023, &num_decimal1, TRUE))
@@ -286,8 +294,8 @@ int trata_wfill(Lista_ligada *wfill, Lista_ligada **lista_de_desconhecidos, List
 
 	else
 	{
-		printf("ERROR on line %d\n", (int) argumento2->info);
-		printf("Argumento invalido para a diretiva .wfill!\n");
+		fprintf(saida, "ERROR on line %d\n", (int) argumento2->info);
+		fprintf(saida, "Argumento invalido para a diretiva .wfill!\n");
 		return 1;
 	}
 }
@@ -303,8 +311,8 @@ int trata_word(Lista_ligada *argumento1, Lista_ligada **lista_de_desconhecidos, 
 
 	if (orientacao[0] == 'D')
 	{
-		printf("ERROR on line %d\n", (int) argumento1->info);
-		printf("A diretiva .word nao pode ser utilizada quando se esta no lado direito da palavra de memoria!\n");
+		fprintf(saida, "ERROR on line %d\n", (int) argumento1->info);
+		fprintf(saida, "A diretiva .word nao pode ser utilizada quando se esta no lado direito da palavra de memoria!\n");
 		return 1;
 	}
 
@@ -362,8 +370,8 @@ int trata_word(Lista_ligada *argumento1, Lista_ligada **lista_de_desconhecidos, 
 	}
 	else
 	{
-		printf("ERROR on line %d\n", (int) argumento1->info);
-		printf("O argumento da diretiva .word deve ser um decimal(0:123) ou hexadecimal (Ex: 0x0000000010)!\n");
+		fprintf(saida, "ERROR on line %d\n", (int) argumento1->info);
+		fprintf(saida, "O argumento da diretiva .word deve ser um decimal(0:123) ou hexadecimal (Ex: 0x0000000010)!\n");
 		return 1;
 	}
 

@@ -6,29 +6,29 @@ int verifica_parametros(int argc,char *argv[], char **arquivo_de_entrada, char *
 	{
 		case (1):
 		{
-			printf("Erro! Arquivo de entrada nao fornecido!\n");
+			fprintf(saida, "Erro! Arquivo de entrada nao fornecido!\n");
 			return 1;
 		}
 
 		case (2):
 		{
 			*arquivo_de_entrada = argv[1];
-			printf("Arquivo de Entrada: %s\n", *arquivo_de_entrada);
+			fprintf(saida, "Arquivo de Entrada: %s\n", *arquivo_de_entrada);
 			return 0;
 		}
 
 		case (3):
 		{
 			*arquivo_de_entrada = argv[1];	
-			printf("Arquivo de Entrada: %s\n", *arquivo_de_entrada);
+			// fprintf(saida, "Arquivo de Entrada: %s\n", *arquivo_de_entrada);
 
 			*arquivo_de_saida = argv[2];
-			printf("Arquivo de Saida: %s\n", *arquivo_de_saida);
+			// fprintf(saida, "Arquivo de Saida: %s\n", *arquivo_de_saida);
 			return 0;
 		}
 		default:
 		{
-			printf("Erro! Excesso de parametros.\n");
+			fprintf(saida, "Erro! Excesso de parametros.\n");
 			return 1;
 		}
 	}
@@ -50,7 +50,7 @@ Lista_ligada* le_arquivo_de_entrada(char* arquivo_de_entrada)
 	// Verifica se o arquivo foi aberto corretamente.
 	if (ponteiro_arq_de_entrada == NULL)
 	{
-		printf("Arquivo \"%s\" nao foi encontrado!\n", arquivo_de_entrada);
+		fprintf(saida, "Arquivo \"%s\" nao foi encontrado!\n", arquivo_de_entrada);
 		return NULL;
 	}
 
@@ -120,27 +120,39 @@ Lista_ligada* le_arquivo_de_entrada(char* arquivo_de_entrada)
 	return programa;
 }
 
-void grava_arquivo_de_saida(Lista_ligada *mapa, char *arquivo_de_saida)
+FILE * get_arquivo_de_escrita(char *arquivo_de_saida)
 {
-	FILE *ponteiro_de_saida;
-	int palavra_atual = -1;
-	char *endereco;
+	FILE* temp = fopen(arquivo_de_saida, "w");
 
-	ponteiro_de_saida = fopen(arquivo_de_saida, "w");
-
-
-	if (ponteiro_de_saida == NULL)
+	if (temp == NULL)
 	{
-		fprintf("Erro ao abrir o arquivo de saida: %s\n", arquivo_de_saida);
-		return;
+		temp = fopen(arquivo_de_saida, "w");
 	}
 
+	if (temp == NULL)
+	{
+		fprintf(stdout, "Erro ao abrir o arquivo de saida: %s\n", arquivo_de_saida);
+	}
+	return temp;
+}
+void grava_arquivo_de_saida(Lista_ligada *mapa)
+{
+	int palavra_atual;
+	char *endereco;
+
+	if (mapa != NULL)
+	{
+		endereco = decimal_para_hex(mapa->info, 3);
+		fprintf(saida, "%s ", endereco);
+		palavra_atual = mapa->info;
+	}
 	for (; mapa != NULL; mapa = mapa->prox)
 	{
 		if (palavra_atual != mapa->info)
 		{
+			fprintf(saida, "\n");
 			endereco = decimal_para_hex(mapa->info, 3);
-			fprintf(ponteiro_de_saida, "%s ", endereco);
+			fprintf(saida, "%s ", endereco);
 			palavra_atual = mapa->info;
 		}
 		
@@ -148,22 +160,27 @@ void grava_arquivo_de_saida(Lista_ligada *mapa, char *arquivo_de_saida)
 		{
 			if (posicao == 2)
 			{
-				fprintf(ponteiro_de_saida, " ");
+				fprintf(saida, " ");
 			}
-			fprintf(ponteiro_de_saida, "%c", mapa->string[posicao]);
+			fprintf(saida, "%c", mapa->string[posicao]);
 		}
 		// Caso esteja no lado esquerdo.
 		if (mapa->string2[0] == 'E')
 		{
-			fprintf(ponteiro_de_saida, " ");
-		}
-		// lado direito.
-		else
-		{
-			fprintf(ponteiro_de_saida, "\n");	
+			fprintf(saida, " ");
+
+			// Completa com zeros o lado direito da palavra.
+			if (mapa->prox == NULL || mapa->prox->string2[0] == 'E')
+			{
+				fprintf(saida, "00 000");
+			}
 
 		}
 	}
+	fprintf(saida, "\n");
 
-	fclose(ponteiro_de_saida);
+	if (saida != NULL)
+	{
+		fclose(saida);
+	}
 }

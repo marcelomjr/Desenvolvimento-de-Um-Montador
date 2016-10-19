@@ -19,8 +19,8 @@ boolean verifica_hexadecimal(Lista_ligada *numero, long int min, long int max, b
 	{		
 		if (imprime_erros)
 		{
-			printf("ERROR on line %d\n", (int) numero->info);
-			printf("Numeros hexadecimais devem possuir 12 digitos e comecar com \"0x\" (Ex: 0x0000000000)!\n");
+			fprintf(saida, "ERROR on line %d\n", (int) numero->info);
+			fprintf(saida, "Numeros hexadecimais devem possuir 12 digitos e comecar com \"0x\" (Ex: 0x0000000000)!\n");
 		}
 		return FALSE;
 	}
@@ -32,8 +32,8 @@ boolean verifica_hexadecimal(Lista_ligada *numero, long int min, long int max, b
 		{
 			if (imprime_erros)
 			{
-				printf("ERROR on line %d\n", (int) numero->info);
-				printf("Caractere \'%c\' eh invalido para um numero hexadecimal!\n", chr);
+				fprintf(saida, "ERROR on line %d\n", (int) numero->info);
+				fprintf(saida, "Caractere \'%c\' eh invalido para um numero hexadecimal!\n", chr);
 			}
 			return FALSE;		
 		}
@@ -52,9 +52,12 @@ boolean verifica_hexadecimal(Lista_ligada *numero, long int min, long int max, b
 
 	if (!(numero_decimal >= min && numero_decimal <= max))
 	{
-		printf("ERROR on line %d\n", (int) numero->info);
-		printf("O argumento deve estar no intervalo (0x%s:0x%s)!\n", decimal_para_hex(min, 10), decimal_para_hex(max, 10));
-		return 1;
+		if (imprime_erros)
+		{
+			fprintf(saida, "ERROR on line %d\n", (int) numero->info);
+			fprintf(saida, "O argumento deve estar no intervalo (0x%s:0x%s)!\n", decimal_para_hex(min, 10), decimal_para_hex(max, 10));
+		}
+		return FALSE;
 	}
 
 	return TRUE;
@@ -81,8 +84,8 @@ boolean verifica_decimal (Lista_ligada *numero, long int min, long int max, long
 		{
 			if (imprime_erros)
 			{
-				printf("ERROR on line %d\n", (int) numero->info);
-				printf("Caractere \'%c\' eh invalido para um numero decimal!\n", caractere);
+				fprintf(saida, "ERROR on line %d\n", (int) numero->info);
+				fprintf(saida, "Caractere \'%c\' eh invalido para um numero decimal!\n", caractere);
 			}
 			return FALSE;		
 		}
@@ -105,8 +108,8 @@ boolean verifica_decimal (Lista_ligada *numero, long int min, long int max, long
 	{
 		if (imprime_erros)
 		{
-			printf("ERROR on line %d\n", (int) numero->info);
-			printf("Numero decimal esperado deveria estar no intervalo (%ld:%ld)!\n", min, max);
+			fprintf(saida, "ERROR on line %d\n", (int) numero->info);
+			fprintf(saida, "Numero decimal esperado deveria estar no intervalo (%ld:%ld)!\n", min, max);
 		}
 		return FALSE;
 	}
@@ -121,8 +124,8 @@ boolean verifica_rotulo(Lista_ligada *rotulo, boolean imprime_erros)
 	{
 		if (imprime_erros)
 		{
-			printf("ERROR on line %d\n", (int) rotulo->info);
-			printf("Rotulos nao podem ser iniciados com um numero!\n");
+			fprintf(saida, "ERROR on line %d\n", (int) rotulo->info);
+			fprintf(saida, "Rotulos nao podem ser iniciados com um numero!\n");
 		}
 		return FALSE;
 	}
@@ -134,8 +137,8 @@ boolean verifica_rotulo(Lista_ligada *rotulo, boolean imprime_erros)
 		{
 			if (imprime_erros)
 			{
-				printf("ERROR on line %d\n", (int) rotulo->info);
-				printf("Caractere \'%c\' eh invalido para um rotulo!\n", chr);
+				fprintf(saida, "ERROR on line %d\n", (int) rotulo->info);
+				fprintf(saida, "Caractere \'%c\' eh invalido para um rotulo!\n", chr);
 			}
 			return FALSE;
 		}
@@ -153,8 +156,8 @@ boolean verifica_simbolo(Lista_ligada *simbolo, boolean imprime_erros)
 	{
 		if (imprime_erros)
 		{
-			printf("ERROR on line %d\n", (int) simbolo->info);
-			printf("Simbolos nao podem ser iniciados com um numero!\n");
+			fprintf(saida, "ERROR on line %d\n", (int) simbolo->info);
+			fprintf(saida, "Simbolos nao podem ser iniciados com um numero!\n");
 		}
 		return FALSE;
 	}
@@ -167,8 +170,8 @@ boolean verifica_simbolo(Lista_ligada *simbolo, boolean imprime_erros)
 
 		if (imprime_erros)
 		{
-			printf("ERROR on line %d\n", (int) simbolo->info);
-			printf("Caractere \'%c\' eh invalido para um simbolo!\n", chr);
+			fprintf(saida, "ERROR on line %d\n", (int) simbolo->info);
+			fprintf(saida, "Caractere \'%c\' eh invalido para um simbolo!\n", chr);
 		}
 			return FALSE;		
 		}

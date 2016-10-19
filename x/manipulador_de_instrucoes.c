@@ -37,8 +37,8 @@ int tratador_de_instrucoes(Lista_ligada **instrucao, Lista_ligada **lista_de_des
 		// Verifica se ha argumentos para a instrucao.
 		if ((*instrucao)->prox == NULL || (*instrucao)->info != (*instrucao)->prox->info)
 		{	
-			printf("ERROR on line %d\n", (int) (*instrucao)->info);
-			printf("A instrucao %s necessita de  um argumento!\n", (*instrucao)->string);
+			fprintf(saida, "ERROR on line %d\n", (int) (*instrucao)->info);
+			fprintf(saida, "A instrucao %s necessita de  um argumento!\n", (*instrucao)->string);
 			return 1;
 		}
 
@@ -48,8 +48,8 @@ int tratador_de_instrucoes(Lista_ligada **instrucao, Lista_ligada **lista_de_des
 
 		if (argumento->string[0] != '"' || argumento->string[tamanho - 2] != '"')
 		{
-			printf("ERROR on line %d\n", (int) (*instrucao)->info);
-			printf("O argumento de uma instrucao deve ser colocado entre aspas duplas!\n");
+			fprintf(saida, "ERROR on line %d\n", (int) (*instrucao)->info);
+			fprintf(saida, "O argumento de uma instrucao deve ser colocado entre aspas duplas!\n");
 			return 1;	
 		}
 
@@ -94,17 +94,17 @@ int tratador_de_instrucoes(Lista_ligada **instrucao, Lista_ligada **lista_de_des
 		// Caso o argumento seja invalido.
 		else
 		{
-			printf("ERROR on line %d\n", (int) (*instrucao)->info);
-			printf("Argumento de instrucao invalido: %s. Utilize decimais (0:1023), hexadecimais ou rotulos!\n", argumento->string);
+			fprintf(saida, "ERROR on line %d\n", (int) (*instrucao)->info);
+			fprintf(saida, "Argumento de instrucao invalido: %s. Utilize decimais (0:1023), hexadecimais ou rotulos!\n", argumento->string);
 			return 1;
 		}
+		*instrucao = (*instrucao)->prox;
 	}
 		
-		avanca_meia_palavra(mapa, meia_palavra, orientacao, palavra_atual, align, FALSE);
+		
+	avanca_meia_palavra(mapa, meia_palavra, orientacao, palavra_atual, align, FALSE);
 
-		*instrucao = (*instrucao)->prox;
-
-		return 0;
+	return 0;
 }
 
 int identifica_instrucao(Lista_ligada *instrucao)
@@ -179,8 +179,8 @@ int identifica_instrucao(Lista_ligada *instrucao)
 	}
 	else
 	{
-		printf("ERROR on line %d\n", (int) instrucao->info);
-		printf("Elemento nao identificado: %s!\n",instrucao->string);
+		fprintf(saida, "ERROR on line %d\n", (int) instrucao->info);
+		fprintf(saida, "Elemento nao identificado: %s!\n",instrucao->string);
 		return -1;
 	}
 }

@@ -10,7 +10,6 @@ void avanca_meia_palavra(Lista_ligada **mapa, char *meia_palavra, char *orientac
 	
 	if (align == 0)
 	{
-		printf("****************************************************************************************\n");
 		adiciona_celula(mapa, meia_palavra, orientacao, *num_palavra);
 
 		if (orientacao[0] == 'E')
@@ -67,15 +66,14 @@ void imprime_mapa(Lista_ligada** mapa)
 	Lista_ligada *apontador = *mapa;
 	char *endereco;
 	int palavra_atual = -1;
-	Lista_ligada *temp1, *temp2;
-
+	
 	for (; apontador != NULL; apontador = apontador->prox)
 	{
 		if (palavra_atual != apontador->info)
 		{
-			printf("\n");	
+			fprintf(saida, "\n");	
 			endereco = decimal_para_hex(apontador->info, 3);
-			printf("%s ", endereco);
+			fprintf(saida, "%s ", endereco);
 			palavra_atual = apontador->info;
 			
 		}
@@ -84,34 +82,15 @@ void imprime_mapa(Lista_ligada** mapa)
 		{
 			if (posicao == 2)
 			{
-					printf(" ");
+					fprintf(saida, " ");
 			}
-			printf("%c", apontador->string[posicao]);
+			fprintf(saida, "%c", apontador->string[posicao]);
 		}
 		// Caso esteja no lado esquerdo.
 		if (apontador->string2[0] == 'E')
 		{
-			printf(" ");
-			if ((apontador->prox == NULL) || (apontador->prox->string2[0] == 'E'))
-			{
-				printf("00 000");
-			}
-		}
-		// caso esteja no lado direito.
-		else
-		{
-			if ((apontador->prox != NULL) && (apontador->prox->string2[0] == 'D'))
-			{
-			
-			temp1 = apontador;
-			temp2 = apontador->prox;
-			apontador->prox = NULL;
-
-			adiciona_celula(mapa, "00000", "E", apontador->prox->info);
-			apontador = temp1;
-			apontador->prox->prox = temp2;
-			}
+			fprintf(saida, " ");
 		}
 	}
-	printf("\n");
+	fprintf(saida, "\n");
 }

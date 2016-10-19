@@ -1,0 +1,4 @@
+ERROR on line 3
+O argumento deve estar no intervalo (0x0000000000:0x00000003FF)!
+ERROR on line 4
+Argumento 2 invalido para a diretiva .set!

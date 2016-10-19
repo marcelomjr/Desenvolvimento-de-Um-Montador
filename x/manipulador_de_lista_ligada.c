@@ -75,26 +75,26 @@ void imprime_lista(Lista_ligada *lista, int opcao_de_string)
 		if (lista->info != linha_atual)
 		{
 			linha_atual = lista->info;
-			printf("\n");
-			printf("%.2d:", linha_atual);
+			fprintf(saida, "\n");
+			fprintf(saida, "%.2d:", linha_atual);
 		}
 		if (opcao_de_string == 1)
 		{
-			printf("[%s] ", lista->string);
+			fprintf(saida, "[%s] ", lista->string);
 		}
 		else if (opcao_de_string == 2)
 		{
-			printf("[%s] ", lista->string2);
+			fprintf(saida, "[%s] ", lista->string2);
 		}
 		else if (opcao_de_string == 12)
 		{
-			printf("[%s|%s] ", lista->string, lista->string2);
+			fprintf(saida, "[%s|%s] ", lista->string, lista->string2);
 		}
 		else if (opcao_de_string == 123)
 		{
-			printf("[%ld|%s|%s] ", lista->info, lista->string, lista->string2);
+			fprintf(saida, "[%ld|%s|%s] ", lista->info, lista->string, lista->string2);
 		}
 		lista = lista->prox;
 	}
-	printf("\n");
+	fprintf(saida, "\n");
 }
